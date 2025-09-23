@@ -1,0 +1,65 @@
+/* spacing-override.css */
+/* วางไฟล์นี้ใน src/styles/ หรือ src/ แล้ว import ใน App.js หรือ index.js */
+
+/* แก้ไข Hero section */
+#hero {
+  padding-top: 2rem !important; /* แทน py-15 */
+  padding-bottom: 2rem !important;
+}
+
+/* แก้ไข Services section */
+#services {
+  margin-top: 2rem !important; /* แทน -mt-10 */
+  padding-top: 3rem !important; /* แทน py-16 */
+  padding-bottom: 3rem !important;
+  min-height: auto !important; /* แทน min-h-screen */
+}
+
+/* แก้ไข News section */
+#News {
+  margin-top: 2rem !important; /* แทน -mt-10 */
+  padding-top: 3rem !important; /* แทน py-16 */
+  padding-bottom: 3rem !important;
+  min-height: auto !important; /* แทน min-h-screen */
+}
+
+/* แก้ไข Footer */
+footer {
+  margin-top: 2rem !important; /* แทน lg:-mt-30 */
+}
+
+/* ลด gap ใน grid sections */
+#services .relative.z-20 > div:last-child {
+  gap: 2rem !important;
+}
+
+#News .relative.z-20 > div:last-child {
+  gap: 2rem !important;
+}
+
+/* ปรับ background images ให้ไม่แยงพื้นที่มาก */
+.relative img[alt=""]:not([class*="hero"]) {
+  opacity: 0.5 !important;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+  #hero {
+    padding-top: 1.5rem !important;
+    padding-bottom: 1.5rem !important;
+  }
+  
+  #services,
+  #News {
+    padding-top: 2rem !important;
+    padding-bottom: 2rem !important;
+    margin-top: 1rem !important;
+  }
+}
+
+/* Large screen adjustments */
+@media (min-width: 1024px) {
+  footer {
+    margin-top: 3rem !important; /* ไม่ใช่ -7.5rem (lg:-mt-30) */
+  }
+}

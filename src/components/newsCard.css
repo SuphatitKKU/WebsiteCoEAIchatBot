@@ -1,0 +1,88 @@
+/* newsCard.css */
+
+@keyframes news-liquid-gradient-flow {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.news-liquid-glass {
+  position: relative;
+  background: rgba(255, 255, 255, 0.08); /* A bit more transparent base */
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  overflow: hidden;
+  transform-style: preserve-3d; /* Enable 3D transformations */
+}
+
+.news-liquid-glass::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.1),
+    rgba(255, 255, 255, 0.05)
+  );
+  z-index: 0;
+  pointer-events: none;
+  border-radius: inherit;
+}
+
+.news-liquid-glass .news-liquid-overlay {
+  background: linear-gradient(
+    45deg,
+    rgba(255, 255, 255, 0.2) 0%,
+    rgba(255, 255, 255, 0.05) 25%,
+    rgba(255, 255, 255, 0.2) 50%,
+    rgba(255, 255, 255, 0.05) 75%,
+    rgba(255, 255, 255, 0.2) 100%
+  );
+  background-size: 400% 400%;
+  animation: news-liquid-gradient-flow 15s ease infinite;
+  opacity: 0; /* Hidden by default */
+  transition: opacity 0.5s ease-out;
+  mix-blend-mode: soft-light; /* Blends nicely with the glass effect */
+  border-radius: inherit;
+}
+
+.news-liquid-glass:hover .news-liquid-overlay {
+  opacity: 1; /* Show on hover */
+}
+
+/* Adjustments for text shadows on hover for better readability on liquid effect */
+.news-liquid-glass h3 {
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.2); /* Base shadow for title */
+  transition: text-shadow 0.3s ease-out;
+  color: #f3f4f6; /* สีข้อความเริ่มต้นเป็นสีเทาอ่อน */
+}
+
+.news-liquid-glass:hover h3 {
+  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.3), 0 0 10px rgba(0, 0, 0, 0.1); /* Darker shadow on hover */
+  color: #ffffff; /* สีข้อความขาวขึ้นเมื่อ hover */
+}
+
+.news-liquid-glass p {
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.15); /* Base shadow for description */
+  transition: text-shadow 0.3s ease-out;
+  color: #d1d5db; /* สีข้อความเริ่มต้นเป็นสีเทา */
+}
+
+.news-liquid-glass:hover p {
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.25), 0 0 8px rgba(0, 0, 0, 0.08); /* Darker shadow on hover */
+  color: #e5e7eb; /* สีข้อความขาวขึ้นเล็กน้อยเมื่อ hover */
+}
+
+.news-liquid-glass .text-gray-600 {
+  color: #9ca3af; /* สีสำหรับ source และ date */
+}
+
+.news-liquid-glass:hover .text-gray-600 {
+  color: #f3f4f6; /* สีสว่างขึ้นเมื่อ hover */
+}
