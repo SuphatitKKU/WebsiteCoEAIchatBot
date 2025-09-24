@@ -1,0 +1,359 @@
+/* AdminDashboard.css */
+
+/* Custom colors */
+:root {
+  --primary-color: #a73b24;
+  --primary-hover: #8a2e1a;
+  --primary-light: #fef2f2;
+}
+
+/* Sidebar styles */
+.sidebar {
+  transition: width 0.3s ease;
+  background-color: white;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+.sidebar-brand {
+  background-color: var(--primary-color);
+  color: white;
+}
+
+.sidebar-nav-item {
+  transition: all 0.2s ease;
+  border-right: 4px solid transparent;
+}
+
+.sidebar-nav-item:hover {
+  background-color: #f9fafb;
+}
+
+.sidebar-nav-item.active {
+  border-right-color: var(--primary-color);
+  background-color: var(--primary-light);
+}
+
+.sidebar-nav-item.active .nav-icon,
+.sidebar-nav-item.active .nav-text {
+  color: var(--primary-color);
+  font-weight: 500;
+}
+
+.sidebar-nav-item .nav-icon {
+  color: #6b7280;
+}
+
+/* Stats cards gradient backgrounds */
+.stats-card-students {
+  background: linear-gradient(135deg, #a73b24 0%, #8a2e1a 100%);
+}
+
+.stats-card-courses {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+}
+
+.stats-card-chats {
+  background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+}
+
+.stats-card-response {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+}
+
+/* Button styles */
+.btn-primary {
+  background-color: var(--primary-color);
+  color: white;
+  transition: opacity 0.2s ease;
+}
+
+.btn-primary:hover {
+  opacity: 0.9;
+}
+
+.btn-secondary {
+  background-color: #e5e7eb;
+  color: #374151;
+  transition: background-color 0.2s ease;
+}
+
+.btn-secondary:hover {
+  background-color: #d1d5db;
+}
+
+/* Form styles */
+.form-input {
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+  transition: all 0.2s ease;
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: transparent;
+  box-shadow: 0 0 0 2px var(--primary-color);
+}
+
+.form-select {
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+  transition: all 0.2s ease;
+}
+
+.form-select:focus {
+  outline: none;
+  border-color: transparent;
+  box-shadow: 0 0 0 2px var(--primary-color);
+}
+
+/* Table styles */
+.table-container {
+  overflow-x: auto;
+}
+
+.table {
+  min-width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.table th {
+  background-color: #f9fafb;
+  padding: 0.75rem 1.5rem;
+  text-align: left;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.table td {
+  padding: 1rem 1.5rem;
+  white-space: nowrap;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.table tr:hover {
+  background-color: #f9fafb;
+}
+
+/* Status badges */
+.status-badge {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border-radius: 9999px;
+}
+
+.status-active {
+  background-color: #d1fae5;
+  color: #065f46;
+}
+
+.status-draft {
+  background-color: #fef3c7;
+  color: #92400e;
+}
+
+.status-inactive {
+  background-color: #fee2e2;
+  color: #991b1b;
+}
+
+.status-resolved {
+  background-color: #d1fae5;
+  color: #065f46;
+}
+
+.status-pending {
+  background-color: #fef3c7;
+  color: #92400e;
+}
+
+/* Modal styles */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 50;
+  overflow-y: auto;
+}
+
+.modal-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 1rem;
+  text-align: center;
+}
+
+.modal-content {
+  background-color: white;
+  border-radius: 0.5rem;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  transform: scale(1);
+  transition: all 0.3s ease;
+  max-width: 32rem;
+  width: 100%;
+  padding: 1.5rem;
+  text-align: left;
+  overflow: hidden;
+}
+
+/* Action buttons */
+.action-button {
+  transition: all 0.2s ease;
+}
+
+.action-button:hover {
+  opacity: 0.7;
+}
+
+.action-view {
+  color: var(--primary-color);
+}
+
+.action-edit {
+  color: #059669;
+}
+
+.action-delete {
+  color: #dc2626;
+}
+
+/* Search input */
+.search-input-container {
+  position: relative;
+}
+
+.search-icon {
+  position: absolute;
+  left: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #9ca3af;
+  width: 1rem;
+  height: 1rem;
+}
+
+.search-input {
+  padding-left: 2.25rem;
+  padding-right: 1rem;
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+}
+
+/* Empty state */
+.empty-state {
+  text-align: center;
+  padding: 2rem;
+  color: #6b7280;
+}
+
+.empty-state-icon {
+  width: 3rem;
+  height: 3rem;
+  margin: 0 auto 1rem auto;
+  opacity: 0.5;
+}
+
+/* Notification badge */
+.notification-badge {
+  position: absolute;
+  top: -0.25rem;
+  right: -0.25rem;
+  width: 0.75rem;
+  height: 0.75rem;
+  background-color: #ef4444;
+  border-radius: 50%;
+}
+
+/* Course ranking number */
+.ranking-number {
+  background-color: var(--primary-color);
+  color: white;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.875rem;
+  font-weight: bold;
+  margin-right: 0.75rem;
+}
+
+/* Star rating */
+.star-rating {
+  color: #fbbf24;
+}
+
+/* Responsive utilities */
+@media (max-width: 768px) {
+  .sidebar {
+    position: fixed;
+    z-index: 40;
+    height: 100vh;
+  }
+  
+  .sidebar.collapsed {
+    transform: translateX(-100%);
+  }
+  
+  .main-content {
+    margin-left: 0;
+  }
+}
+
+@media (min-width: 768px) {
+  .main-content {
+    margin-left: 4rem;
+  }
+  
+  .sidebar.expanded + .main-content {
+    margin-left: 16rem;
+  }
+}
+
+/* Utility classes */
+.shadow-lg {
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+.rounded-lg {
+  border-radius: 0.5rem;
+}
+
+.transition-all {
+  transition: all 0.3s ease;
+}
+
+.grid-responsive {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.grid-cols-1 {
+  grid-template-columns: repeat(1, 1fr);
+}
+
+@media (min-width: 768px) {
+  .grid-cols-2 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .grid-cols-3 {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  
+  .grid-cols-4 {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
