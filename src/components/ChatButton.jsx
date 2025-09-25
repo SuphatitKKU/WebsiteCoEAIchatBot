@@ -199,7 +199,7 @@ const ChatButton = () => {
         <div 
           className={`fixed bottom-20 right-4 z-50 flex flex-col
                       w-11/12 sm:w-80 md:w-96 lg:w-96 xl:w-[420px] 
-                      h-[calc(100vh-120px)] sm:h-[450px] md:h-[500px] lg:h-[600px] xl:h-[650px]
+                      h-[calc(100vh-200px)] sm:h-[350px] md:h-[400px] lg:h-[450px] xl:h-[500px] // <<<--- แก้ไขความสูงตรงนี้
                       bg-white/90 backdrop-blur-xl rounded-lg shadow-2xl border border-white/30
                       transition-all duration-300 ease-out origin-bottom-right
                       ${isOpen 
