@@ -1,5 +1,5 @@
 import React from 'react';
-import { FaFacebook, FaTwitter, FaInstagram, FaLinkedin } from 'react-icons/fa';
+import { FaFacebook } from 'react-icons/fa';
 import assets from '../assets/assets'; // Assuming 'assets' contains your logo
 
 const Footer = () => {
@@ -27,16 +27,19 @@ const Footer = () => {
               มหาวิทยาลัยขอนแก่น เพื่อการเรียนรู้และพัฒนาในยุคเทคโนโลยี
             </p>
             <nav className="flex space-x-4">
-              <a href="#" className="text-gray-700 hover:text-blue-600 text-sm transition-colors">
+              <a href="#" className="text-gray-700 hover:[color:#9a1518] text-sm transition-colors">
                 หน้าแรก
               </a>
-              <a href="#" className="text-gray-700 hover:text-blue-600 text-sm transition-colors">
-                หลักสูตร
+              <a href="#" className="text-gray-700 hover:[color:#9a1518] text-sm transition-colors">
+                เกณฑ์การรับเข้า
               </a>
-              <a href="#" className="text-gray-700 hover:text-blue-600 text-sm transition-colors">
-                ผลงาน
+              <a href="#" className="text-gray-700 hover:[color:#9a1518] text-sm transition-colors">
+                ข้อมูลหลักสูตร
               </a>
-              <a href="#" className="text-gray-700 hover:text-blue-600 text-sm transition-colors">
+              <a href="#" className="text-gray-700 hover:[color:#9a1518] text-sm transition-colors">
+                แนะแนว&กิจกรรม
+              </a>
+              <a href="#" className="text-gray-700 hover:[color:#9a1518] text-sm transition-colors">
                 ติดต่อเรา
               </a>
             </nav>
@@ -52,7 +55,7 @@ const Footer = () => {
               ด้านเทคโนโลยีและวิศวกรรม
             </p>
             <div className="flex space-x-4">
-              <a href="#" className="hover:text-blue-600 text-gray-600 transition-colors">
+              <a href="#" className="text-gray-600 hover:[color:#9a1518] transition-colors">
                 <FaFacebook size={20} />
               </a>
             </div>
