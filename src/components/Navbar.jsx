@@ -8,10 +8,9 @@ export const Navbar = () => {
     <div className='flex justify-between items-center px-4 sm:px-12 lg:px-24 xl:px-40 py-4 sticky top-0 z-50
       backdrop-blur-xl bg-white/20 border border-white/30 
       shadow-[0_4px_30px_rgba(0,0,0,0.1)] 
-      rounded-2xl 
       before:content-[""] before:absolute before:inset-0 
       before:bg-gradient-to-br before:from-white/40 before:to-transparent 
-      before:rounded-2xl before:pointer-events-none relative '>
+      before:pointer-events-none relative '>
 
       {/* Logo */}
       <img src={assets.logo} className='w-32 sm:w-40 relative z-10' alt='Logo'/>
