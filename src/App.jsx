@@ -52,10 +52,12 @@ const HomePage = () => {
 // NotFound Component
 const NotFound = () => {
   return (
-    <div className="flex items-center justify-center min-h-[60vh]">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold text-gray-800 mb-4">404</h1>
-        <p className="text-xl text-gray-600">ไม่พบหน้าที่คุณค้นหา</p>
+    <div className="min-h-screen p-8">
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <div className="text-center">
+          <h1 className="text-4xl font-bold text-gray-800 mb-4">404</h1>
+          <p className="text-xl text-gray-600">ไม่พบหน้าที่คุณค้นหา</p>
+        </div>
       </div>
     </div>
   )
