@@ -1,0 +1,794 @@
+.card-wrap {
+    background: #ffffff;
+    min-height: 100vh;
+    padding: 60px 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.card-page-title {
+    font-size: 42px;
+    font-weight: 900;
+    color: #9a1518;
+    margin-bottom: 20px;
+    text-shadow: 2px 2px #e5c7c7;
+    text-align: center;
+}
+
+.card {
+    width: min(1000px, 95%);
+    position: relative;
+    margin: 28px auto 44px;
+    min-height: 520px;
+}
+
+.card-translucent {
+    background: rgba(255, 255, 255, .65);
+    border-radius: 24px;
+    box-shadow: 0 16px 44px rgba(0, 0, 0, .12);
+}
+
+.card-inner {
+    padding: 28px 32px 34px;
+}
+
+.round-rail {
+    position: absolute;
+    left: -120px;
+    top: 200px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    z-index: 10;
+}
+
+.round-pill {
+    min-width: 120px;
+    padding: 12px 14px;
+    border: none;
+    cursor: pointer;
+    background: #f1f5f9;
+    color: #0f172a;
+    font-weight: 800;
+    border-radius: 12px 0 0 12px;
+    text-align: center;
+    box-shadow: 0 6px 14px rgba(0, 0, 0, .08);
+    transition: background .15s ease, color .15s ease;
+}
+
+.round-pill:hover {
+    background: #fce4e4;
+}
+
+.round-pill.is-active {
+    background: #9a1518;
+    color: #fff;
+}
+
+.card-head {
+    display: flex;
+    align-items: flex-start;
+    gap: 22px;
+    margin-bottom: 6px;
+}
+
+.card-logo {
+    width: 160px;
+    height: 200px;
+    border-radius: 10%;
+    overflow: hidden;
+    flex-shrink: 0;
+    margin-top: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #fff;
+}
+
+.card-logo-img {
+    width:100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.card-title-wrap {
+    height: 160px;
+    position: relative;
+    flex: 1;
+}
+
+.card-title {
+    position: relative;
+    top: 90px;
+    font-size: 25px;
+    font-weight: 800;
+    margin: 0 0 10px;
+    color: #111827;
+    line-height: 1.3;
+}
+
+.card-dash {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -50px;
+    width: 100%;
+    height: 5px;
+    background: repeating-linear-gradient(90deg, #9a1518 0, #9a1518 12px, transparent 12px, transparent 24px);
+}
+
+.card-sub {
+    text-align: center;
+    font-size: 22px;
+    font-weight: 900;
+    margin-top: 30px;
+    margin-bottom: 28px;
+    text-decoration: underline;
+}
+
+.card-detail {
+    font-size: 16px;
+    line-height: 1.7;
+    color: #333;
+}
+
+.kv {
+    display: grid;
+    grid-template-columns: 240px 1fr;
+    gap: 14px;
+    margin-bottom: 10px;
+}
+
+.k {
+    font-weight: 800;
+    color: #1f2937;
+}
+
+.v {
+    color: #111827;
+}
+
+.divider {
+    border: none;
+    border-top: 2px solid #e5e7eb;
+    margin: 18px 0;
+}
+
+.round-sum {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    font-size: 16px;
+}
+
+.accord {
+    background: #ffffff;
+    border-radius: 12px;
+    border: 1px solid #d4a5a5;
+    margin: 12px 0;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, .04);
+}
+
+.accord-head {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 16px 18px;
+    color: #1a1a1a;
+    font-weight: 900;
+    cursor: pointer;
+    border: none;
+    background: transparent;
+    text-align: left;
+}
+
+.accord.open .accord-head {
+    background: #f3c0c0;
+}
+
+.accord-title {
+    flex: 1;
+    font-size: 14px;
+    line-height: 1.4;
+}
+
+.accord-right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0;
+}
+
+.accord-badge {
+    padding: 6px 12px;
+    border-radius: 999px;
+    border: 3px solid #9a1518;
+    color: #000000;
+    background: #f9f3f3;
+    font-weight: 900;
+    font-size: 12px;
+    white-space: nowrap;
+}
+
+.accord-caret {
+    transition: transform .15s ease;
+    font-size: 18px;
+}
+
+.accord-caret.up {
+    transform: rotate(180deg);
+}
+
+.accord-body {
+    padding: 16px 18px 18px;
+    background: #fff;
+}
+
+.section-wrap {
+    display: block;
+}
+
+.section-title {
+    font-weight: 900;
+    font-size: 18px;
+    margin: 14px 0 6px;
+    color: #1f2937;
+}
+
+.section-body {
+    margin-bottom: 14px;
+    line-height: 1.6;
+    color: #374151;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(4px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.fade-in {
+    animation: fadeIn .25s ease;
+}
+
+/* Enhanced Responsive Design */
+
+/* Large screens - slightly adjust round rail position */
+@media (max-width: 1400px) {
+    .round-rail {
+        left: -110px;
+    }
+}
+
+/* Medium-large screens */
+@media (max-width: 1200px) {
+    .card-wrap {
+        padding: 50px 15px;
+    }
+    
+    .round-rail {
+        left: -100px;
+    }
+    
+    .round-pill {
+        min-width: 100px;
+        font-size: 14px;
+        padding: 10px 12px;
+    }
+    
+    .card-title {
+        font-size: 23px;
+    }
+    
+    .card-page-title {
+        font-size: 38px;
+    }
+}
+
+/* Tablets and small laptops */
+@media (max-width: 1024px) {
+    .card-wrap {
+        padding: 40px 15px;
+    }
+    
+    .card {
+        width: min(900px, 95%);
+    }
+    
+    .card-inner {
+        padding: 24px 28px 30px;
+    }
+    
+    .card-head {
+        gap: 18px;
+    }
+    
+    .card-logo {
+        width: 140px;
+        height: 180px;
+    }
+    
+    .card-title {
+        font-size: 22px;
+        top: 80px;
+    }
+    
+    .kv {
+        grid-template-columns: 200px 1fr;
+        gap: 12px;
+    }
+}
+
+/* Breaking point - move rail to horizontal */
+@media (max-width: 980px) {
+    .card-wrap {
+        padding: 40px 15px;
+    }
+    
+    .card-page-title {
+        font-size: 32px;
+    }
+    
+    .round-rail {
+        position: static;
+        flex-direction: row;
+        margin: 16px 0 24px;
+        left: auto;
+        top: auto;
+        overflow-x: auto;
+        gap: 12px;
+        padding: 12px 16px 16px;
+        background: rgba(255, 255, 255, 0.8);
+        border-radius: 16px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, .06);
+    }
+
+    .round-pill {
+        border-radius: 12px;
+        min-width: 110px;
+        font-size: 14px;
+        padding: 12px 16px;
+        flex-shrink: 0;
+        white-space: nowrap;
+    }
+
+    .card {
+        min-height: unset;
+        margin: 20px auto 36px;
+    }
+    
+    .card-inner {
+        padding: 20px 24px 26px;
+    }
+
+    .card-head {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        gap: 16px;
+    }
+    
+    .card-logo {
+        width: 120px;
+        height: 150px;
+        margin-top: 0;
+    }
+
+    .card-title-wrap {
+        height: auto;
+        width: 100%;
+    }
+    
+    .card-title {
+        position: static;
+        top: auto;
+        font-size: 21px;
+        margin-bottom: 16px;
+    }
+
+    .card-dash {
+        position: static;
+        width: 100%;
+        margin-top: 8px;
+        bottom: auto;
+    }
+    
+    .card-sub {
+        font-size: 20px;
+        margin-top: 24px;
+        margin-bottom: 20px;
+    }
+
+    .kv {
+        grid-template-columns: 1fr;
+        gap: 6px;
+        margin-bottom: 16px;
+    }
+    
+    .k {
+        font-size: 15px;
+        margin-bottom: 4px;
+    }
+    
+    .v {
+        font-size: 15px;
+        margin-bottom: 8px;
+        padding-left: 12px;
+        border-left: 3px solid #9a1518;
+    }
+    
+    .round-sum {
+        font-size: 15px;
+        gap: 10px;
+    }
+    
+    .accord-head {
+        padding: 14px 16px;
+    }
+    
+    .accord-title {
+        font-size: 14px;
+    }
+    
+    .accord-badge {
+        font-size: 12px;
+        padding: 5px 10px;
+    }
+    
+    .section-title {
+        font-size: 17px;
+        margin: 16px 0 8px;
+    }
+    
+    .section-body {
+        font-size: 15px;
+        margin-bottom: 16px;
+    }
+}
+
+/* Tablets portrait */
+@media (max-width: 768px) {
+    .card-wrap {
+        padding: 40px 15px;
+    }
+    
+    .card-page-title {
+        font-size: 30px;
+        margin-bottom: 20px;
+    }
+    
+    .card {
+        width: min(90%, 100%);
+        margin: 20px auto 32px;
+    }
+    
+    .card-inner {
+        padding: 22px 24px 26px;
+    }
+    
+    .card-title {
+        font-size: 20px;
+    }
+    
+    .card-sub {
+        font-size: 19px;
+        margin-top: 26px;
+        margin-bottom: 22px;
+    }
+    
+    .round-rail {
+        gap: 12px;
+        padding: 14px 16px 18px;
+        margin: 16px 0 24px;
+    }
+    
+    .round-pill {
+        min-width: 100px;
+        font-size: 14px;
+        padding: 12px 16px;
+    }
+    
+    .card-logo {
+        width: 110px;
+        height: 140px;
+    }
+    
+    .kv {
+        gap: 8px;
+        margin-bottom: 16px;
+    }
+    
+    .k {
+        font-size: 15px;
+        margin-bottom: 4px;
+    }
+    
+    .v {
+        font-size: 15px;
+        padding-left: 12px;
+        line-height: 1.5;
+    }
+    
+    .round-sum {
+        gap: 10px;
+    }
+    
+    .section-title {
+        margin: 18px 0 10px;
+    }
+    
+    .section-body {
+        margin-bottom: 18px;
+    }
+}
+
+/* Mobile phones */
+@media (max-width: 480px) {
+    .card-wrap {
+        padding: 30px 20px;
+        max-width: 100vw;
+        overflow-x: hidden;
+    }
+    
+    .card-page-title {
+        font-size: 24px;
+        margin-bottom: 20px;
+        text-shadow: 1px 1px #e5c7c7;
+        padding: 0 10px;
+    }
+    
+    .card {
+        width: 100%;
+        max-width: calc(100vw - 40px);
+        margin: 20px 0 36px;
+        box-sizing: border-box;
+    }
+    
+    .card-translucent {
+        border-radius: 16px;
+        box-shadow: 0 6px 20px rgba(0, 0, 0, .1);
+    }
+    
+    .card-inner {
+        padding: 18px 16px 22px;
+        box-sizing: border-box;
+    }
+    
+    .card-head {
+        gap: 12px;
+        margin-bottom: 16px;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+    
+    .card-logo {
+        width: 80px;
+        height: 100px;
+        border-radius: 8%;
+        flex-shrink: 0;
+    }
+    
+    .card-title-wrap {
+        width: 100%;
+        height: auto;
+    }
+    
+    .card-title {
+        font-size: 16px;
+        line-height: 1.3;
+        margin-bottom: 8px;
+        position: static;
+        word-wrap: break-word;
+        hyphens: auto;
+    }
+    
+    .card-dash {
+        height: 3px;
+        margin-top: 8px;
+        position: static;
+        width: 100%;
+    }
+    
+    .card-sub {
+        font-size: 17px;
+        margin: 20px 0 16px;
+    }
+    
+    .round-rail {
+        gap: 8px;
+        padding: 10px 12px 14px;
+        border-radius: 12px;
+        margin: 12px 0 16px;
+        overflow-x: auto;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+    }
+    
+    .round-rail::-webkit-scrollbar {
+        display: none;
+    }
+    
+    .round-pill {
+        min-width: 70px;
+        font-size: 12px;
+        padding: 8px 12px;
+        border-radius: 10px;
+        flex-shrink: 0;
+        white-space: nowrap;
+    }
+    
+    .kv {
+        gap: 4px;
+        margin-bottom: 14px;
+        grid-template-columns: 1fr;
+    }
+    
+    .k {
+        font-size: 13px;
+        margin-bottom: 2px;
+        font-weight: 800;
+    }
+    
+    .v {
+        font-size: 13px;
+        padding-left: 8px;
+        border-left-width: 3px;
+        border-left: 3px solid #9a1518;
+        line-height: 1.4;
+        word-wrap: break-word;
+        hyphens: auto;
+    }
+    
+    .round-sum {
+        font-size: 13px;
+        gap: 8px;
+    }
+    
+    .round-sum > div {
+        padding: 6px 0;
+        word-wrap: break-word;
+    }
+    
+    .divider {
+        margin: 16px 0;
+    }
+    
+    .accord {
+        margin: 12px 0;
+        border-radius: 10px;
+    }
+    
+    .accord-head {
+        padding: 12px 14px;
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+    
+    .accord-title {
+        font-size: 12px;
+        line-height: 1.4;
+        flex: 1;
+        min-width: 0;
+        word-wrap: break-word;
+        hyphens: auto;
+    }
+    
+    .accord-right {
+        flex-shrink: 0;
+        gap: 6px;
+    }
+    
+    .accord-badge {
+        font-size: 10px;
+        padding: 4px 8px;
+        border-width: 2px;
+        white-space: nowrap;
+    }
+    
+    .accord-caret {
+        font-size: 14px;
+    }
+    
+    .accord-body {
+        padding: 12px 14px 14px;
+    }
+    
+    .section-title {
+        font-size: 14px;
+        margin: 12px 0 6px;
+    }
+    
+    .section-body {
+        font-size: 12px;
+        margin-bottom: 14px;
+        line-height: 1.5;
+        word-wrap: break-word;
+        hyphens: auto;
+    }
+}
+
+/* Very small screens */
+@media (max-width: 360px) {
+    .card-wrap {
+        padding: 25px 15px;
+        max-width: 100vw;
+        overflow-x: hidden;
+    }
+    
+    .card-page-title {
+        font-size: 20px;
+        margin-bottom: 16px;
+        padding: 0 5px;
+    }
+    
+    .card {
+        max-width: calc(100vw - 30px);
+        margin: 16px 0 28px;
+    }
+    
+    .card-inner {
+        padding: 14px 12px 18px;
+    }
+    
+    .card-title {
+        font-size: 14px;
+        line-height: 1.3;
+    }
+    
+    .card-sub {
+        font-size: 15px;
+        margin: 16px 0 14px;
+    }
+    
+    .round-pill {
+        min-width: 60px;
+        font-size: 11px;
+        padding: 6px 10px;
+    }
+    
+    .k, .v {
+        font-size: 11px;
+    }
+    
+    .v {
+        padding-left: 6px;
+        border-left-width: 2px;
+    }
+    
+    .section-title {
+        font-size: 13px;
+        margin: 10px 0 5px;
+    }
+    
+    .section-body {
+        font-size: 11px;
+        margin-bottom: 12px;
+    }
+    
+    .accord-head {
+        padding: 10px 12px;
+    }
+    
+    .accord-title {
+        font-size: 11px;
+    }
+    
+    .accord-badge {
+        font-size: 9px;
+        padding: 3px 6px;
+    }
+    
+    .accord-body {
+        padding: 10px 12px 12px;
+    }
+}
