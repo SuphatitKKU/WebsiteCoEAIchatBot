@@ -792,3 +792,10 @@
         padding: 10px 12px 12px;
     }
 }
+
+/* Add bottom spacing for larger screens only */
+@media (min-width: 769px) {
+    .card-wrap {
+        margin-bottom: 120px;
+    }
+}
