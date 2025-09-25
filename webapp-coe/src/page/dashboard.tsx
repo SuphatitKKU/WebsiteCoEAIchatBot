@@ -75,25 +75,22 @@ const AdminDashboard: React.FC = () => {
 
     // Sample data
     const stats: Stats = {
-        totalStudents: 2847,
-        activeCourses: 45,
-        chatInteractions: 12540,
+        totalStudents: 327,
+        activeCourses: 4,
+        chatInteractions: 32,
         responseRate: 95.8
     };
 
     const recentChats: Chat[] = [
         { id: 1, student: 'สมชาย ใจดี', course: 'วิศวกรรมคอมพิวเตอร์', time: '5 นาที', status: 'resolved' },
-        { id: 2, student: 'สุมาลี แสงแก้ว', course: 'บริหารธุรกิจ', time: '12 นาที', status: 'pending' },
-        { id: 3, student: 'อนุชา มั่นคง', course: 'การแพทย์', time: '25 นาที', status: 'resolved' },
-        { id: 4, student: 'นิดา รักเรียน', course: 'พยาบาลศาสตร์', time: '1 ชั่วโมง', status: 'resolved' }
+        { id: 2, student: 'สุมาลี แสงแก้ว', course: 'วิศวกรรมคอมพิวเตอร์', time: '12 นาที', status: 'pending' },
+        { id: 3, student: 'อนุชา มั่นคง', course: 'วิศวกรรมสื่อดิจิทัล', time: '25 นาที', status: 'resolved' },
+        { id: 4, student: 'นิดา รักเรียน', course: 'วิศวกรรมสื่อดิจิทัล', time: '1 ชั่วโมง', status: 'resolved' }
     ];
 
     const courses: Course[] = [
         { id: 1, name: 'วิศวกรรมคอมพิวเตอร์', inquiries: 245, satisfaction: 4.8 },
-        { id: 2, name: 'การแพทย์', inquiries: 189, satisfaction: 4.9 },
-        { id: 3, name: 'บริหารธุรกิจ', inquiries: 167, satisfaction: 4.7 },
-        { id: 4, name: 'พยาบาลศาสตร์', inquiries: 134, satisfaction: 4.8 },
-        { id: 5, name: 'สถาปัตยกรรม', inquiries: 98, satisfaction: 4.6 }
+        { id: 2, name: 'วิศวกรรมสื่อดิจิทัล', inquiries: 189, satisfaction: 4.9 },
     ];
 
     const coursesData: CourseData[] = [
@@ -101,72 +98,32 @@ const AdminDashboard: React.FC = () => {
             id: 1,
             name: 'วิศวกรรมคอมพิวเตอร์',
             faculty: 'คณะวิศวกรรมศาสตร์',
-            code: 'CPE',
+            code: 'COE',
             duration: '4 ปี',
-            tuition: '45000',
+            tuition: '15000',
             status: 'active',
-            inquiries: 245,
+            inquiries: 12,
             satisfaction: 4.8,
             description: 'เรียนรู้การพัฒนาซอฟต์แวร์ ฮาร์ดแวร์ และระบบเครือข่าย',
             requirements: 'คณิต, ฟิสิกส์, อังกฤษ',
-            createdAt: '2024-01-15'
+            createdAt: '2025-07-15'
         },
         {
             id: 2,
-            name: 'การแพทย์',
-            faculty: 'คณะแพทยศาสตร์',
-            code: 'MD',
-            duration: '6 ปี',
-            tuition: '120000',
+            name: 'วิศวกรรมสื่อดิจิทัล',
+            faculty: 'คณะวิศวกรรมศาสตร์',
+            code: 'DME',
+            duration: '4 ปี',
+            tuition: '15000',
             status: 'active',
-            inquiries: 189,
+            inquiries: 8,
             satisfaction: 4.9,
-            description: 'การศึกษาด้านการแพทย์และการรักษาผู้ป่วย',
-            requirements: 'คณิต, ฟิสิกส์, เคมี, ชีววิทยา',
-            createdAt: '2024-01-10'
+            description: 'เรียนรู้การพัฒนาซอฟต์แวร์ ฮาร์ดแวร์ และระบบเครือข่าย',
+            requirements: 'คณิต, ฟิสิกส์, อังกฤษ',
+            createdAt: '2025-07-10'
         },
-        {
-            id: 3,
-            name: 'บริหารธุรกิจ',
-            faculty: 'คณะบริหารธุรกิจ',
-            code: 'BBA',
-            duration: '4 ปี',
-            tuition: '35000',
-            status: 'active',
-            inquiries: 167,
-            satisfaction: 4.7,
-            description: 'การจัดการองค์กร การตลาด และการเงิน',
-            requirements: 'คณิต, อังกฤษ, สังคมศึกษา',
-            createdAt: '2024-01-08'
-        },
-        {
-            id: 4,
-            name: 'พยาบาลศาสตร์',
-            faculty: 'คณะพยาบาลศาสตร์',
-            code: 'NSG',
-            duration: '4 ปี',
-            tuition: '55000',
-            status: 'active',
-            inquiries: 134,
-            satisfaction: 4.8,
-            description: 'การดูแลผู้ป่วยและการส่งเสริมสุขภาพ',
-            requirements: 'คณิต, ฟิสิกส์, เคมี, ชีววิทยา',
-            createdAt: '2024-01-05'
-        },
-        {
-            id: 5,
-            name: 'สถาปัตยกรรม',
-            faculty: 'คณะสถาปัตยกรรมศาสตร์',
-            code: 'ARCH',
-            duration: '5 ปี',
-            tuition: '65000',
-            status: 'draft',
-            inquiries: 98,
-            satisfaction: 4.6,
-            description: 'การออกแบบอาคารและการวางผังเมือง',
-            requirements: 'คณิต, ฟิสิกส์, ศิลปะ',
-            createdAt: '2024-01-03'
-        }
+        
+        
     ];
 
     const [selectedCourse, setSelectedCourse] = useState<CourseData | null>(null);
@@ -211,7 +168,7 @@ const AdminDashboard: React.FC = () => {
                     </div>
                     <div className="flex items-center mt-4 text-sm">
                         <TrendingUp className="w-4 h-4 mr-1" />
-                        <span>+3 หลักสูตรใหม่</span>
+                        <span>+1 หลักสูตรใหม่</span>
                     </div>
                 </div>
 
@@ -269,35 +226,7 @@ const AdminDashboard: React.FC = () => {
                         ))}
                     </div>
                 </div>
-
-                {/* Popular Courses */}
-                <div className="bg-white rounded-lg shadow-lg p-6">
-                    <div className="flex items-center justify-between mb-4">
-                        <h3 className="text-lg font-semibold">หลักสูตรที่ได้รับความสนใจ</h3>
-                        <button className="text-sm text-red-600 hover:text-red-800">ดูทั้งหมด</button>
-                    </div>
-                    <div className="space-y-4">
-                        {courses.map((course, index) => (
-                            <div key={course.id} className="flex items-center justify-between">
-                                <div className="flex items-center">
-                                    <div className="ranking-number">
-                                        {index + 1}
-                                    </div>
-                                    <div>
-                                        <p className="font-medium text-gray-900">{course.name}</p>
-                                        <p className="text-sm text-gray-600">{course.inquiries} คำถาม</p>
-                                    </div>
-                                </div>
-                                <div className="text-right">
-                                    <div className="flex items-center">
-                                        <span className="star-rating">★</span>
-                                        <span className="text-sm font-medium ml-1">{course.satisfaction}</span>
-                                    </div>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                </div>
+                
             </div>
         </div>
     );
@@ -515,10 +444,6 @@ const AdminDashboard: React.FC = () => {
                                             >
                                                 <option value="">เลือกคณะ</option>
                                                 <option value="คณะวิศวกรรมศาสตร์">คณะวิศวกรรมศาสตร์</option>
-                                                <option value="คณะแพทยศาสตร์">คณะแพทยศาสตร์</option>
-                                                <option value="คณะบริหารธุรกิจ">คณะบริหารธุรกิจ</option>
-                                                <option value="คณะพยาบาลศาสตร์">คณะพยาบาลศาสตร์</option>
-                                                <option value="คณะสถาปัตยกรรมศาสตร์">คณะสถาปัตยกรรมศาสตร์</option>
                                             </select>
                                         </div>
                                         <div>
@@ -767,7 +692,7 @@ const AdminDashboard: React.FC = () => {
                                     <Bot className="w-6 h-6 text-white" />
                                 </div>
                                 <div>
-                                    <h2 className="text-lg font-bold text-gray-900">AI Admin</h2>
+                                    <h2 className="text-lg font-bold text-gray-900">CODME Admin</h2>
                                     <p className="text-sm text-gray-500">ระบบจัดการ</p>
                                 </div>
                             </div>
@@ -813,7 +738,7 @@ const AdminDashboard: React.FC = () => {
                             <h1 className="text-2xl font-bold text-gray-900">
                                 {menuItems.find(item => item.id === activeTab)?.label}
                             </h1>
-                            <p className="text-gray-600">จัดการระบบ AI Chatbot สำหรับมหาวิทยาลัย</p>
+                            <p className="text-gray-600">CODME Admin management</p>
                         </div>
                         <div className="flex items-center space-x-4">
                             <button className="p-2 rounded-lg hover:bg-gray-100 relative">
