@@ -12,10 +12,10 @@ export const Navbar = () => {
   return (
     <div
       className='flex justify-between items-center px-4 sm:px-12 lg:px-24 xl:px-40 py-4
-                 sticky top-0 z-50 backdrop-blur-xl bg-white/20 border border-white/30
-                 shadow-[0_4px_30px_rgba(0,0,0,0.1)]
+                 sticky top-0 z-50 backdrop-blur-xl bg-white/60 border border-white/40
+                 shadow-[0_4px_30px_rgba(0,0,0,0.05)]
                  before:content-[""] before:absolute before:inset-0
-                 before:bg-gradient-to-br before:from-white/40 before:to-transparent
+                 before:bg-gradient-to-br before:from-white/60 before:to-white/30
                  before:pointer-events-none relative'
     >
       {/* Logo */}
@@ -75,17 +75,20 @@ export const Navbar = () => {
         </Link>
       </div>
 
-      {/* Mobile Sidebar */}
+      {/* Mobile Sidebar - ปรับให้สว่างขึ้น */}
       <div
         className={`sm:hidden fixed top-0 bottom-0 right-0 z-50
           ${sidebarOpen ? 'w-72' : 'w-0'}
           overflow-hidden transition-all duration-300 ease-in-out
-          bg-primary text-white min-h-screen flex flex-col pt-16`}
+          bg-gradient-to-br from-white/95 to-gray-50/95 backdrop-blur-xl 
+          border-l border-gray-200/50 text-gray-700 min-h-screen flex flex-col pt-16
+          shadow-xl`}
       >
         <img
           src={assets.close_icon}
           alt="Close"
-          className='w-6 absolute right-4 top-4 cursor-pointer hover:scale-110 transition-transform'
+          className='w-6 absolute right-4 top-4 cursor-pointer hover:scale-110 transition-transform
+                     filter brightness-0 opacity-70 hover:opacity-100'
           onClick={() => setSidebarOpen(false)}
         />
 
@@ -93,8 +96,8 @@ export const Navbar = () => {
           <Link 
             to="/" 
             onClick={() => setSidebarOpen(false)} 
-            className={`text-lg py-2 border-b border-white/20 hover:text-white/80 transition-colors ${
-              isActive('/') ? 'font-semibold text-white' : 'text-white/90'
+            className={`text-lg py-2 border-b border-gray-200/50 hover:text-primary transition-colors ${
+              isActive('/') ? 'font-semibold text-primary' : 'text-gray-700'
             }`}
           >
             หน้าหลัก
@@ -103,8 +106,8 @@ export const Navbar = () => {
           <Link 
             to="/admission" 
             onClick={() => setSidebarOpen(false)} 
-            className={`text-lg py-2 border-b border-white/20 hover:text-white/80 transition-colors ${
-              isActive('/admission') ? 'font-semibold text-white' : 'text-white/90'
+            className={`text-lg py-2 border-b border-gray-200/50 hover:text-primary transition-colors ${
+              isActive('/admission') ? 'font-semibold text-primary' : 'text-gray-700'
             }`}
           >
             เกณฑ์การรับเข้า
@@ -113,8 +116,8 @@ export const Navbar = () => {
           <Link 
             to="/course" 
             onClick={() => setSidebarOpen(false)} 
-            className={`text-lg py-2 border-b border-white/20 hover:text-white/80 transition-colors ${
-              isActive('/course') ? 'font-semibold text-white' : 'text-white/90'
+            className={`text-lg py-2 border-b border-gray-200/50 hover:text-primary transition-colors ${
+              isActive('/course') ? 'font-semibold text-primary' : 'text-gray-700'
             }`}
           >
             ข้อมูลหลักสูตร
@@ -123,8 +126,8 @@ export const Navbar = () => {
           <Link 
             to="/activity" 
             onClick={() => setSidebarOpen(false)} 
-            className={`text-lg py-2 border-b border-white/20 hover:text-white/80 transition-colors ${
-              isActive('/activity') ? 'font-semibold text-white' : 'text-white/90'
+            className={`text-lg py-2 border-b border-gray-200/50 hover:text-primary transition-colors ${
+              isActive('/activity') ? 'font-semibold text-primary' : 'text-gray-700'
             }`}
           >
             แนะแนว&กิจกรรม
@@ -133,8 +136,8 @@ export const Navbar = () => {
           <Link 
             to="/contact" 
             onClick={() => setSidebarOpen(false)} 
-            className={`text-lg py-2 border-b border-white/20 hover:text-white/80 transition-colors ${
-              isActive('/contact') ? 'font-semibold text-white' : 'text-white/90'
+            className={`text-lg py-2 border-b border-gray-200/50 hover:text-primary transition-colors ${
+              isActive('/contact') ? 'font-semibold text-primary' : 'text-gray-700'
             }`}
           >
             ติดต่อ
@@ -145,9 +148,9 @@ export const Navbar = () => {
             to="/feedback"
             onClick={() => setSidebarOpen(false)}
             className='flex items-center justify-center gap-2
-                       bg-white text-primary px-6 py-3 rounded-full mt-6
-                       cursor-pointer hover:scale-105 transition-all
-                       font-semibold text-base shadow-lg'
+                       bg-primary text-white px-6 py-3 rounded-full mt-6
+                       cursor-pointer hover:scale-105 hover:bg-primary/90 transition-all
+                       font-semibold text-base shadow-lg hover:shadow-xl'
           >
             ข้อเสนอแนะ →
           </Link>
@@ -159,13 +162,14 @@ export const Navbar = () => {
         {/* Mobile Menu Button */}
         <button
           onClick={() => setSidebarOpen(true)}
-          className='sm:hidden p-2 hover:bg-black/10 rounded-lg transition-colors'
+          className='sm:hidden p-2 hover:bg-white/20 rounded-lg transition-colors
+                     border border-gray-200/30 bg-white/10 backdrop-blur-sm'
           aria-label="Open menu"
         >
           <img
             src={assets.menu_icon}
             alt="Menu"
-            className='w-6 h-6'
+            className='w-6 h-6 filter brightness-0 opacity-70'
           />
         </button>
 
@@ -182,10 +186,10 @@ export const Navbar = () => {
         </Link>
       </div>
 
-      {/* Mobile Backdrop */}
+      {/* Mobile Backdrop - ปรับให้อ่อนลง */}
       {sidebarOpen && (
         <div 
-          className="sm:hidden fixed inset-0 bg-black/50 z-40"
+          className="sm:hidden fixed inset-0 bg-black/20 backdrop-blur-sm z-40"
           onClick={() => setSidebarOpen(false)}
         />
       )}
