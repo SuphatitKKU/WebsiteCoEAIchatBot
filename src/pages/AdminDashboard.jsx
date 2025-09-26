@@ -479,7 +479,7 @@ const AdminDashboard = () => {
       {/* Sidebar */}
       <aside className={`transition-all duration-300 ${isSidebarOpen ? 'w-full lg:w-64' : 'w-full lg:w-20'} ${isSidebarOpen ? 'lg:relative' : 'lg:relative'} bg-[#9a1518] text-white flex flex-col lg:h-screen`}>
         <div className="flex items-center justify-between p-4 border-b border-white/20">
-            <h1 className={`font-bold text-xl lg:text-2xl ${!isSidebarOpen && 'lg:hidden'}`}>Admin</h1>
+            <h1 className={`font-bold text-xl lg:text-2xl ${!isSidebarOpen && 'lg:hidden'}`}>CODME</h1>
             <button onClick={() => setIsSidebarOpen(!isSidebarOpen)} className="p-2 rounded-lg hover:bg-white/20">
                 {isSidebarOpen ? <ChevronLeft size={20} /> : <Menu size={20} />}
             </button>

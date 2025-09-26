@@ -42,7 +42,7 @@ const News = () => {
                     /* Desktop - 1600px ขึ้นไป */
                     @media (min-width: 1600px) {
                         .news-responsive {
-                            margin-top: -330px;
+                            margin-top: -430px;
                         }
                     }
                 `}

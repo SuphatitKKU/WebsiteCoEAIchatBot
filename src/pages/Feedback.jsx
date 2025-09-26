@@ -48,12 +48,12 @@ export default function Feedback() {
   const handleSubmit = (e) => {
     e.preventDefault();
     // ในที่นี้จะจำลองการส่งข้อมูล
-    console.log("Feedback Submitted:", { 
-      name, 
-      email, 
-      feedbackType, 
-      message, 
-      rating 
+    console.log("Feedback Submitted:", {
+      name,
+      email,
+      feedbackType,
+      message,
+      rating,
     });
     setSubmitted(true);
     // คุณสามารถเพิ่ม logic สำหรับการส่งข้อมูลจริงไปยัง API ได้ที่นี่
@@ -70,7 +70,7 @@ export default function Feedback() {
 
   return (
     <main
-      className="relative min-h-screen overflow-hidden py-10 px-4 sm:px-6 lg:px-8"
+      className="relative min-h-screen overflow-hidden pt-10 pb-20 px-4 sm:px-6 lg:px-8" // <-- ✨ แก้ไขจุดนี้
       style={{
         backgroundColor: "#ffffff",
       }}
@@ -88,7 +88,6 @@ export default function Feedback() {
           zIndex: 0,
         }}
       />
-      
 
       {/* Content wrapper with higher z-index */}
       <div className="relative z-10 max-w-4xl mx-auto">
@@ -128,7 +127,7 @@ export default function Feedback() {
               </div>
               <button
                 onClick={resetForm}
-                                  className="px-8 py-3 bg-gradient-to-r from-[#dc2626] to-[#7d1315] text-white rounded-lg hover:from-[#b91c1c] hover:to-[#6b1513] focus:outline-none focus:ring-4 focus:ring-red-200 transition-all duration-200 shadow-lg hover:shadow-xl"
+                className="px-8 py-3 bg-gradient-to-r from-[#dc2626] to-[#7d1315] text-white rounded-lg hover:from-[#b91c1c] hover:to-[#6b1513] focus:outline-none focus:ring-4 focus:ring-red-200 transition-all duration-200 shadow-lg hover:shadow-xl"
               >
                 ส่งความคิดเห็นอีกครั้ง
               </button>
