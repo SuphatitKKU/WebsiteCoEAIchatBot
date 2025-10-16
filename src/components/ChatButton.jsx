@@ -255,7 +255,7 @@ ${contextData}
       {/* Chat Window */}
       {isVisible && (
         <div className={`fixed bottom-24 right-6 z-50 flex flex-col
-                        w-[calc(100vw-3rem)] sm:w-96 md:w-[420px] lg:w-[460px]
+                        w-[calc(100vw-3rem)] max-w-[460px] /* เพิ่ม max-w ที่นี่ */
                         h-[calc(100vh-180px)] sm:h-[500px] md:h-[580px] lg:h-[650px]
                         rounded-2xl shadow-[0_20px_60px_rgba(0,0,0,0.3)]
                         transition-all duration-300 ease-out origin-bottom-right overflow-hidden
