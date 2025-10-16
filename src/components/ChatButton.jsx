@@ -249,8 +249,9 @@ ${contextData}
       {/* Chat Window */}
       {isVisible && (
         <div className={`fixed bottom-24 right-6 z-50 flex flex-col
-                    w-[calc(100vw-3rem)] sm:w-96 md:w-[420px] lg:w-[460px]
-                    h-[calc(100vh-350px)] sm:h-[380px] md:h-[430px] lg:h-[480px] {/* ปรับความสูงโดยตรงตรงนี้ */}
+                    w-[calc(100vw-3rem)]
+                    h-[calc(100vh-280px)] sm:h-[380px] md:h-[500px] lg:h-[550px] {/* ปรับความสูงสำหรับแต่ละขนาดจอ */}
+                    sm:w-96 md:w-[420px] lg:w-[460px]
                     rounded-2xl shadow-[0_20px_60px_rgba(0,0,0,0.3)]
                     transition-all duration-300 ease-out origin-bottom-right overflow-hidden
                     ${isOpen ? 'opacity-100 scale-100 translate-y-0' : 'opacity-0 scale-95 translate-y-4'}`}
