@@ -8,7 +8,7 @@ const ChatButton = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [courseCoEData, setCourseCoEData] = useState('');
   const [courseDMEData, setCourseDMEData] = useState('');
-  const [isTablet, setIsTablet] = useState(false);
+  // ไม่ต้องใช้ isTablet อีกต่อไป
   const chatContentRef = useRef(null);
 
   const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
@@ -41,18 +41,9 @@ const ChatButton = () => {
       ]);
     }
 
-    const checkTablet = () => {
-      setIsTablet(window.matchMedia('(min-width: 640px) and (max-width: 1024px)').matches);
-    };
+    // ลบ logic การตรวจสอบ Tablet ออกไป
 
-    checkTablet();
-    window.addEventListener('resize', checkTablet);
-
-    return () => {
-      window.removeEventListener('resize', checkTablet);
-    };
-
-  }, []);
+  }, []); // Empty dependency array means this runs once on mount
 
   useEffect(() => {
     if (chatContentRef.current) {
@@ -235,15 +226,9 @@ ${contextData}
 
   const showInitialWelcomeUI = messages.length === 1 && messages[0].sender === 'ai';
 
-  // Determine chatbox height based on isTablet state
-  // ปรับค่าความสูงตรงนี้เพื่อลดขนาดลง
-  const chatboxHeightClass = isTablet
-    ? 'h-[calc(100vh-350px)] sm:h-[300px] md:h-[350px] lg:h-[400px]' // สั้นลงไปอีกสำหรับ tablets
-    : 'h-[calc(100vh-280px)] sm:h-[380px] md:h-[450px] lg:h-[500px]'; // ลดความสูงสำหรับจอปกติ (จากเดิม 550px)
-
   return (
     <>
-      {/* Floating Chat Button */}
+      {/* Floating Chat Button (p-4 and h-6 w-6 for bigger button) */}
       <button
         onClick={toggleChat}
         className={`fixed bottom-6 right-6 ${primaryColor} ${primaryHoverColor} text-white p-4 rounded-full shadow-2xl z-50 focus:outline-none focus:ring-4 ${focusRingColor} focus:ring-opacity-50 transition-all duration-300 hover:scale-110 active:scale-95 hover:shadow-[0_0_30px_rgba(154,21,24,0.5)]`}
@@ -263,9 +248,9 @@ ${contextData}
 
       {/* Chat Window */}
       {isVisible && (
-        <div className={`fixed bottom-16 right-6 z-50 flex flex-col
-                    w-[calc(100vw-3rem)] sm:w-80 md:w-[360px] lg:w-[400px]
-                    ${chatboxHeightClass}
+        <div className={`fixed bottom-24 right-6 z-50 flex flex-col
+                    w-[calc(100vw-3rem)] sm:w-96 md:w-[420px] lg:w-[460px]
+                    h-[calc(100vh-350px)] sm:h-[380px] md:h-[430px] lg:h-[480px] {/* ปรับความสูงโดยตรงตรงนี้ */}
                     rounded-2xl shadow-[0_20px_60px_rgba(0,0,0,0.3)]
                     transition-all duration-300 ease-out origin-bottom-right overflow-hidden
                     ${isOpen ? 'opacity-100 scale-100 translate-y-0' : 'opacity-0 scale-95 translate-y-4'}`}
