@@ -6,37 +6,40 @@ const ChatButton = () => {
   const [messages, setMessages] = useState([]);
   const [inputMessage, setInputMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [courseCoEData, setCourseCoEData] = useState('');
-  const [courseDMEData, setCourseDMEData] = useState('');
+  const [courseCoEData, setCourseCoEData] = useState(''); // Renamed for clarity
+  const [courseDMEData, setCourseDMEData] = useState(''); // New state for DME data
   const chatContentRef = useRef(null);
-  
+
   const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
-  const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent`;
+  const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent';
 
   const primaryColor = 'bg-[#9a1518]';
   const primaryHoverColor = 'hover:bg-[#7e1214]';
   const focusRingColor = 'focus:ring-[#9a1518]';
 
   useEffect(() => {
+    // Fetch CoE Course Data
     fetch('/WebsiteCoEAIchatBot/data/course_coe.txt')
       .then(res => res.text())
       .then(text => setCourseCoEData(text))
       .catch(err => console.error('Error loading CoE course knowledge:', err));
 
+    // Fetch DME Course Data (New!)
     fetch('/WebsiteCoEAIchatBot/data/course_dme.txt')
       .then(res => res.text())
       .then(text => setCourseDMEData(text))
       .catch(err => console.error('Error loading DME course knowledge:', err));
 
+    // Add initial AI welcome message
     if (messages.length === 0) {
       setMessages([
-        { 
-          sender: 'ai', 
-          text: `สวัสดีครับ! ฉันคือผู้ช่วยอัจฉริยะของสาขาวิศวกรรมคอมพิวเตอร์ และ สื่อดิจิตอล มหาวิทยาลัยขอนแก่น พร้อมให้คำปรึกษาเกี่ยวกับหลักสูตรและวิชาเรียนต่างๆ มีอะไรให้ช่วยไหมครับ?`
+        {
+          sender: 'ai',
+          text: 'สวัสดีครับ! ฉันคือผู้ช่วยอัจฉริยะของสาขาวิศวกรรมคอมพิวเตอร์ และ สื่อดิจิตอล มหาวิทยาลัยขอนแก่น พร้อมให้คำปรึกษาเกี่ยวกับหลักสูตรและวิชาเรียนต่างๆ มีอะไรให้ช่วยไหมครับ?'
         }
       ]);
     }
-  }, []); 
+  }, []);
 
   useEffect(() => {
     if (chatContentRef.current) {
@@ -91,51 +94,45 @@ const ChatButton = () => {
     setMessages(prev => [...prev, { sender: 'user', text }]);
     setInputMessage('');
 
-    const baseSystemInstruction = `คุณเป็น AI ผู้ช่วยของสาขาวิศวกรรมคอมพิวเตอร์ และ สื่อดิจิตอล มหาวิทยาลัยขอนแก่น ให้คำแนะนำเกี่ยวกับหลักสูตรและวิชาเรียนต่างๆ`;
+    const baseSystemInstruction = 'คุณเป็น AI ผู้ช่วยของสาขาวิศวกรรมคอมพิวเตอร์ และ สื่อดิจิตอล มหาวิทยาลัยขอนแก่น ให้คำแนะนำเกี่ยวกับหลักสูตรและวิชาเรียนต่างๆ';
 
     const lowerCaseText = text.toLowerCase();
-    const isCourseOrTeacherRelated = lowerCaseText.includes('หลักสูตร') || 
-                                     lowerCaseText.includes('วิชา') || 
-                                     lowerCaseText.includes('คณะ') ||
-                                     lowerCaseText.includes('เรียน') ||
-                                     lowerCaseText.includes('สาขา') ||
-                                     lowerCaseText.includes('คอมพิวเตอร์') ||
-                                     lowerCaseText.includes('ดิจิตอล') ||
-                                     lowerCaseText.includes('ภาควิชา') ||
-                                     lowerCaseText.includes('อาจารย์') ||
-                                     lowerCaseText.includes('ผู้สอน') ||
-                                     lowerCaseText.includes('ชื่ออาจารย์') ||
-                                     lowerCaseText.includes('ใครสอน');
+    const isCourseOrTeacherRelated = lowerCaseText.includes('หลักสูตร') ||
+      lowerCaseText.includes('วิชา') ||
+      lowerCaseText.includes('คณะ') ||
+      lowerCaseText.includes('เรียน') ||
+      lowerCaseText.includes('สาขา') ||
+      lowerCaseText.includes('คอมพิวเตอร์') ||
+      lowerCaseText.includes('ดิจิตอล') ||
+      lowerCaseText.includes('ภาควิชา') ||
+      lowerCaseText.includes('อาจารย์') ||
+      lowerCaseText.includes('ผู้สอน') ||
+      lowerCaseText.includes('ชื่ออาจารย์') ||
+      lowerCaseText.includes('ใครสอน');
 
     let contextData = '';
+    // Combine both course data if relevant
     if ((courseCoEData || courseDMEData) && isCourseOrTeacherRelated) {
-      contextData = `
-ข้อมูลหลักสูตรและวิชาเรียน รวมถึงอาจารย์ผู้สอน:
+      contextData = `ข้อมูลหลักสูตรและวิชาเรียน รวมถึงอาจารย์ผู้สอน:
 ${courseCoEData ? `--- หลักสูตรวิศวกรรมคอมพิวเตอร์ ---\n${courseCoEData}` : ''}
 ${courseDMEData ? `--- หลักสูตรสื่อดิจิตอล ---\n${courseDMEData}` : ''}
-
-กรุณาตอบคำถามโดยอ้างอิงจากข้อมูลด้านบนเป็นหลัก ถ้าคำถามไม่เกี่ยวข้องกับข้อมูลที่มี ให้ตอบตามความรู้ทั่วไปแต่แจ้งให้ผู้ใช้ทราบว่าข้อมูลนี้ไม่ได้มาจากฐานข้อมูลหลักสูตร
-`;
+กรุณาตอบคำถามโดยอ้างอิงจากข้อมูลด้านบนเป็นหลัก ถ้าคำถามไม่เกี่ยวข้องกับข้อมูลที่มี ให้ตอบตามความรู้ทั่วไปแต่แจ้งให้ผู้ใช้ทราบว่าข้อมูลนี้ไม่ได้มาจากฐานข้อมูลหลักสูตร`;
     } else {
-      contextData = ``; 
+      contextData = ``;
     }
 
-    const MAX_HISTORY_MESSAGES = 8; 
+    const MAX_HISTORY_MESSAGES = 8;
     const historyForAPI = messages
       .filter(msg => msg.sender === 'user' || msg.sender === 'ai')
-      .slice(Math.max(messages.length - MAX_HISTORY_MESSAGES, 0)) 
+      .slice(Math.max(messages.length - MAX_HISTORY_MESSAGES, 0))
       .map(msg => ({
         role: msg.sender === 'user' ? 'user' : 'model',
         parts: [{ text: msg.text }]
       }));
-    
-    const combinedUserPromptText = `
-${baseSystemInstruction}
 
+    const combinedUserPromptText = `${baseSystemInstruction}
 ${contextData}
-
-คำถาม: ${text}
-`;
+คำถาม: ${text}`;
 
     const contentsToSend = [...historyForAPI, { role: 'user', parts: [{ text: combinedUserPromptText }] }];
 
@@ -155,8 +152,8 @@ ${contextData}
             'X-goog-api-key': GEMINI_API_KEY,
           },
           body: JSON.stringify({
-            contents: contentsToSend, 
-            safetySettings: [ 
+            contents: contentsToSend,
+            safetySettings: [
               {
                 category: 'HARM_CATEGORY_HARASSMENT',
                 threshold: 'BLOCK_MEDIUM_AND_ABOVE'
@@ -178,20 +175,20 @@ ${contextData}
         });
 
         if (!response.ok) {
-          if (response.status === 429 || response.status >= 500) { 
+          if (response.status === 429 || response.status >= 500) {
             console.warn(`Attempt ${attempts} failed with status ${response.status}. Retrying...`);
-            await new Promise(resolve => setTimeout(resolve, 1000 * attempts)); 
+            await new Promise(resolve => setTimeout(resolve, 1000 * attempts));
             continue;
           }
           throw new Error(`API error ${response.status}: ${await response.text()}`);
         }
 
         const data = await response.json();
-        
+
         if (data.promptFeedback && data.promptFeedback.blockReason) {
             geminiResponse = `ข้อความของคุณถูกบล็อกโดยระบบความปลอดภัยของ AI: ${data.promptFeedback.blockReason}`;
         } else if (data.candidates?.[0]?.finishReason === 'SAFETY') {
-             geminiResponse = `ขออภัย คำตอบของ AI ถูกบล็อกโดยระบบความปลอดภัย`;
+             geminiResponse = 'ขออภัย คำตอบของ AI ถูกบล็อกโดยระบบความปลอดภัย';
         } else {
             geminiResponse = data.candidates?.[0]?.content?.parts?.[0]?.text || 'ไม่ได้รับคำตอบจาก AI ที่ถูกต้อง';
         }
@@ -199,7 +196,7 @@ ${contextData}
       } catch (error) {
         console.error(`Attempt ${attempts} failed:`, error);
         if (attempts < MAX_RETRIES) {
-          await new Promise(resolve => setTimeout(resolve, 1000 * attempts)); 
+          await new Promise(resolve => setTimeout(resolve, 1000 * attempts));
         } else {
           geminiResponse = `ขออภัย เกิดข้อผิดพลาดในการเชื่อมต่อกับ AI หรือ API Key ไม่ถูกต้อง: ${error.message}`;
         }
@@ -231,55 +228,41 @@ ${contextData}
       {/* Floating Chat Button */}
       <button
         onClick={toggleChat}
-        className={`fixed z-50 p-5 rounded-full shadow-2xl
-                   ${primaryColor} ${primaryHoverColor} text-white
-                   focus:outline-none focus:ring-4 ${focusRingColor} focus:ring-opacity-50
-                   transition-all duration-300 hover:scale-110 active:scale-95 hover:shadow-[0_0_30px_rgba(154,21,24,0.5)]
-                   bottom-6 right-6 /* default for mobile */
-                   sm:bottom-8 sm:right-8 /* slightly larger for small tablets */
-                   md:bottom-10 md:right-10 /* larger for tablets/desktops */
-                   lg:bottom-12 lg:right-12 /* even larger for large desktops */
-                   `}
+        className={`fixed bottom-6 right-6 ${primaryColor} ${primaryHoverColor} text-white p-5 rounded-full shadow-2xl z-50 focus:outline-none focus:ring-4 ${focusRingColor} focus:ring-opacity-50 transition-all duration-300 hover:scale-110 active:scale-95 hover:shadow-[0_0_30px_rgba(154,21,24,0.5)]`}
       >
         <svg xmlns="http://www.w3.org/2000/svg"
-             className={`h-7 w-7 transition-transform duration-300 ${isOpen ? 'rotate-90' : 'rotate-0'}`}
-             fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          className={`h-7 w-7 transition-transform duration-300 ${isOpen ? 'rotate-90' : 'rotate-0'}`}
+          fill="none" viewBox="0 0 24 24" stroke="currentColor">
           {isOpen ? (
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5}
-                  d="M6 18L18 6M6 6l12 12" />
+              d="M6 18L18 6M6 6l12 12" />
           ) : (
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5}
-                  d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+              d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
           )}
         </svg>
       </button>
 
       {/* Chat Window */}
       {isVisible && (
-        <div className={`fixed z-50 flex flex-col
-                        rounded-2xl shadow-[0_20px_60px_rgba(0,0,0,0.3)]
-                        transition-all duration-300 ease-out origin-bottom-right overflow-hidden
-                        ${isOpen ? 'opacity-100 scale-100 translate-y-0' : 'opacity-0 scale-95 translate-y-4'}
-                        bottom-20 right-3 /* Adjusted for better spacing on small screens */
-                        sm:bottom-24 sm:right-6
-                        md:bottom-28 md:right-8
-                        lg:bottom-32 lg:right-10
-                        `}
-             style={{
-               background: 'rgba(255, 255, 255, 0.5)',
-               backdropFilter: 'blur(20px) saturate(180%)',
-               WebkitBackdropFilter: 'blur(20px) saturate(180%)',
-               border: '1px solid rgba(255, 255, 255, 0.2)',
-               // ปรับขนาดให้เล็กลงมากยิ่งขึ้น
-               width: 'min(300px, calc(100vw - 24px))', // ลด max-width เป็น 300px
-               height: 'min(400px, calc(100vh - 140px))', // ลด max-height เป็น 400px
-             }}>
-          
+        <div className={`fixed bottom-24 right-6 z-50 flex flex-col
+                    w-[calc(100vw-3rem)] sm:w-96 md:w-[420px] lg:w-[460px]
+                    h-[calc(100vh-180px)] sm:h-[500px] md:h-[580px] lg:h-[650px]
+                    rounded-2xl shadow-[0_20px_60px_rgba(0,0,0,0.3)]
+                    transition-all duration-300 ease-out origin-bottom-right overflow-hidden
+                    ${isOpen ? 'opacity-100 scale-100 translate-y-0' : 'opacity-0 scale-95 translate-y-4'}`}
+          style={{
+            background: 'rgba(255, 255, 255, 0.5)',
+            backdropFilter: 'blur(20px) saturate(180%)',
+            WebkitBackdropFilter: 'blur(20px) saturate(180%)',
+            border: '1px solid rgba(255, 255, 255, 0.2)',
+          }}>
+
           {/* Header with Gradient */}
           <div className={`p-4 flex justify-between items-center ${primaryColor} relative overflow-hidden flex-none`}
-               style={{
-                 background: 'linear-gradient(135deg, #9a1518 0%, #c41e22 100%)',
-               }}>
+            style={{
+              background: 'linear-gradient(135deg, #9a1518 0%, #c41e22 100%)',
+            }}>
             <div className="flex items-center space-x-3 z-10">
               <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm">
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -296,7 +279,7 @@ ${contextData}
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
-            
+
             {/* Decorative Elements */}
             <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-16 translate-x-16 blur-2xl"></div>
             <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/10 rounded-full translate-y-12 -translate-x-12 blur-2xl"></div>
@@ -314,11 +297,11 @@ ${contextData}
                   </div>
                   <div className="absolute -top-2 -right-2 w-6 h-6 bg-green-400 rounded-full border-4 border-white animate-pulse"></div>
                 </div>
-                
+
                 <div className="text-center space-y-3">
                   <h4 className="text-2xl font-bold text-gray-800">ยินดีต้อนรับ! 👋</h4>
                   <p className="text-gray-600 text-base leading-relaxed max-w-xs">
-                    ฉันคือผู้ช่วยอัจฉริยะของสาขาวิศวกรรมคอมพิวเตอร์ และ สื่อดิจิตอล<br/>
+                    ฉันคือผู้ช่วยอัจฉริยะของสาขาวิศวกรรมคอมพิวเตอร์ และ สื่อดิจิตอล<br />
                     <span className="text-[#9a1518] font-semibold">มหาวิทยาลัยขอนแก่น</span>
                   </p>
                 </div>
@@ -326,13 +309,13 @@ ${contextData}
                 <div className="w-full max-w-xs space-y-2">
                   <p className="text-sm text-gray-500 text-center font-medium">คำถามแนะนำ:</p>
                   <div className="space-y-2">
-                    <button 
+                    <button
                       onClick={() => setInputMessage('วิชาเลือกสำหรับคนที่ชอบเขียนเว็บมีอะไรบ้าง')}
                       className="w-full p-3 bg-white/60 hover:bg-white/80 backdrop-blur-sm rounded-xl text-sm text-gray-700 text-left transition-all duration-200 border border-gray-200 hover:border-[#9a1518] hover:shadow-md"
                     >
                       💻 วิชาเลือกสำหรับคนที่ชอบเขียนเว็บ
                     </button>
-                    <button 
+                    <button
                       onClick={() => setInputMessage('หลักสูตรของคณะมีอะไรบ้าง')}
                       className="w-full p-3 bg-white/60 hover:bg-white/80 backdrop-blur-sm rounded-xl text-sm text-gray-700 text-left transition-all duration-200 border border-gray-200 hover:border-[#9a1518] hover:shadow-md"
                     >
@@ -341,7 +324,7 @@ ${contextData}
                   </div>
                 </div>
               </div>
-            ) : ( 
+            ) : (
               messages.map((msg, index) => (
                 <div key={index} className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'} animate-fadeIn`}>
                   <div
@@ -361,8 +344,8 @@ ${contextData}
               <div className="flex justify-start animate-fadeIn">
                 <div className="bg-white/80 backdrop-blur-sm text-gray-800 p-4 rounded-2xl rounded-bl-sm shadow-lg border border-white/50 flex space-x-2">
                   <div className="w-2.5 h-2.5 bg-[#9a1518] rounded-full animate-bounce"></div>
-                  <div className="w-2.5 h-2.5 bg-[#9a1518] rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
-                  <div className="w-2.5 h-2.5 bg-[#9a1518] rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
+                  <div className="w-2.5 h-2.5 bg-[#9a1518] rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
+                  <div className="w-2.5 h-2.5 bg-[#9a1518] rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
                 </div>
               </div>
             )}
@@ -370,18 +353,18 @@ ${contextData}
 
           {/* Input Area */}
           <div className="p-4 border-t border-white/30"
-               style={{
-                 background: 'rgba(255, 255, 255, 0.3)',
-                 backdropFilter: 'blur(10px)',
-                 WebkitBackdropFilter: 'blur(10px)',
-               }}>
+            style={{
+              background: 'rgba(255, 255, 255, 0.3)',
+              backdropFilter: 'blur(10px)',
+              WebkitBackdropFilter: 'blur(10px)',
+            }}>
             <div className="flex space-x-2">
               <input
                 type="text"
                 placeholder="พิมพ์ข้อความของคุณที่นี่..."
                 className="flex-grow px-4 py-3 rounded-xl bg-white/70 backdrop-blur-sm border border-gray-200 
-                         focus:outline-none focus:ring-2 focus:ring-[#9a1518] focus:border-transparent
-                         placeholder-gray-400 text-gray-800 transition-all duration-200"
+                     focus:outline-none focus:ring-2 focus:ring-[#9a1518] focus:border-transparent
+                     placeholder-gray-400 text-gray-800 transition-all duration-200"
                 value={inputMessage}
                 onChange={(e) => setInputMessage(e.target.value)}
                 onKeyPress={handleKeyPress}
@@ -390,8 +373,8 @@ ${contextData}
               <button
                 onClick={handleSendMessage}
                 className={`${primaryColor} ${primaryHoverColor} text-white p-3 rounded-xl shadow-lg
-                          transition-all duration-200 hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed
-                          hover:scale-105 active:scale-95 min-w-[52px] flex items-center justify-center`}
+                      transition-all duration-200 hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed
+                      hover:scale-105 active:scale-95 min-w-[52px] flex items-center justify-center`}
                 disabled={isLoading || !inputMessage.trim()}
               >
                 {isLoading ? (
@@ -440,11 +423,6 @@ ${contextData}
 
         *::-webkit-scrollbar-thumb:hover {
           background: rgba(154, 21, 24, 0.7);
-        }
-
-        /* Ensure no body overflow for elements that might push content */
-        body {
-          overflow-x: hidden;
         }
       `}</style>
     </>
