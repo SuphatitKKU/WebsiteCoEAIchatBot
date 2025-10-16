@@ -6,8 +6,9 @@ const ChatButton = () => {
   const [messages, setMessages] = useState([]);
   const [inputMessage, setInputMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [courseCoEData, setCourseCoEData] = useState(''); // Renamed for clarity
-  const [courseDMEData, setCourseDMEData] = useState(''); // New state for DME data
+  const [courseCoEData, setCourseCoEData] = useState('');
+  const [courseDMEData, setCourseDMEData] = useState('');
+  const [isTablet, setIsTablet] = useState(false); // New state for tablet detection
   const chatContentRef = useRef(null);
 
   const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
@@ -24,7 +25,7 @@ const ChatButton = () => {
       .then(text => setCourseCoEData(text))
       .catch(err => console.error('Error loading CoE course knowledge:', err));
 
-    // Fetch DME Course Data (New!)
+    // Fetch DME Course Data
     fetch('/WebsiteCoEAIchatBot/data/course_dme.txt')
       .then(res => res.text())
       .then(text => setCourseDMEData(text))
@@ -39,7 +40,23 @@ const ChatButton = () => {
         }
       ]);
     }
-  }, []);
+
+    // --- Tablet detection logic ---
+    const checkTablet = () => {
+      // For simplicity, defining "tablet" as screens between 640px and 1024px
+      // This can be adjusted based on specific device definitions or design
+      setIsTablet(window.matchMedia('(min-width: 640px) and (max-width: 1024px)').matches);
+    };
+
+    checkTablet(); // Check on initial mount
+    window.addEventListener('resize', checkTablet); // Add listener for resize events
+
+    return () => {
+      window.removeEventListener('resize', checkTablet); // Clean up listener
+    };
+    // --- End tablet detection logic ---
+
+  }, []); // Empty dependency array means this runs once on mount
 
   useEffect(() => {
     if (chatContentRef.current) {
@@ -111,7 +128,6 @@ const ChatButton = () => {
       lowerCaseText.includes('ใครสอน');
 
     let contextData = '';
-    // Combine both course data if relevant
     if ((courseCoEData || courseDMEData) && isCourseOrTeacherRelated) {
       contextData = `ข้อมูลหลักสูตรและวิชาเรียน รวมถึงอาจารย์ผู้สอน:
 ${courseCoEData ? `--- หลักสูตรวิศวกรรมคอมพิวเตอร์ ---\n${courseCoEData}` : ''}
@@ -223,15 +239,20 @@ ${contextData}
 
   const showInitialWelcomeUI = messages.length === 1 && messages[0].sender === 'ai';
 
+  // Determine chatbox height based on isTablet state
+  const chatboxHeightClass = isTablet 
+    ? 'h-[calc(100vh-280px)] sm:h-[350px] md:h-[400px] lg:h-[450px]' // Shorter for tablets
+    : 'h-[calc(100vh-250px)] sm:h-[400px] md:h-[480px] lg:h-[550px]'; // Original height for larger screens
+
   return (
     <>
       {/* Floating Chat Button */}
       <button
         onClick={toggleChat}
-        className={`fixed bottom-6 right-6 ${primaryColor} ${primaryHoverColor} text-white p-3 rounded-full shadow-2xl z-50 focus:outline-none focus:ring-4 ${focusRingColor} focus:ring-opacity-50 transition-all duration-300 hover:scale-110 active:scale-95 hover:shadow-[0_0_30px_rgba(154,21,24,0.5)]`}
+        className={`fixed bottom-6 right-6 ${primaryColor} ${primaryHoverColor} text-white p-4 rounded-full shadow-2xl z-50 focus:outline-none focus:ring-4 ${focusRingColor} focus:ring-opacity-50 transition-all duration-300 hover:scale-110 active:scale-95 hover:shadow-[0_0_30px_rgba(154,21,24,0.5)]`}
       >
         <svg xmlns="http://www.w3.org/2000/svg"
-          className={`h-5 w-5 transition-transform duration-300 ${isOpen ? 'rotate-90' : 'rotate-0'}`}
+          className={`h-6 w-6 transition-transform duration-300 ${isOpen ? 'rotate-90' : 'rotate-0'}`}
           fill="none" viewBox="0 0 24 24" stroke="currentColor">
           {isOpen ? (
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5}
@@ -247,7 +268,7 @@ ${contextData}
       {isVisible && (
         <div className={`fixed bottom-16 right-6 z-50 flex flex-col
                     w-[calc(100vw-3rem)] sm:w-80 md:w-[360px] lg:w-[400px]
-                    h-[calc(100vh-250px)] sm:h-[400px] md:h-[480px] lg:h-[550px]
+                    ${chatboxHeightClass}
                     rounded-2xl shadow-[0_20px_60px_rgba(0,0,0,0.3)]
                     transition-all duration-300 ease-out origin-bottom-right overflow-hidden
                     ${isOpen ? 'opacity-100 scale-100 translate-y-0' : 'opacity-0 scale-95 translate-y-4'}`}
@@ -286,7 +307,7 @@ ${contextData}
           </div>
 
           {/* Chat Content */}
-          <div ref={chatContentRef} className="flex-grow p-3 overflow-y-auto flex flex-col space-y-3 min-h-0 text-sm"> {/* Added text-sm here */}
+          <div ref={chatContentRef} className="flex-grow p-3 overflow-y-auto flex flex-col space-y-3 min-h-0 text-sm">
             {showInitialWelcomeUI ? (
               <div className="flex flex-col items-center justify-center h-full space-y-4 px-3">
                 <div className="relative">
@@ -352,7 +373,7 @@ ${contextData}
           </div>
 
           {/* Input Area */}
-          <div className="p-3 border-t border-white/30 text-sm" // Added text-sm here
+          <div className="p-3 border-t border-white/30 text-sm"
             style={{
               background: 'rgba(255, 255, 255, 0.3)',
               backdropFilter: 'blur(10px)',
@@ -362,7 +383,7 @@ ${contextData}
               <input
                 type="text"
                 placeholder="พิมพ์ข้อความของคุณที่นี่..."
-                className="flex-grow px-3 py-2 rounded-lg bg-white/70 backdrop-blur-sm border border-gray-200 
+                className="flex-grow px-3 py-2 rounded-lg bg-white/70 backdrop-blur-sm border border-gray-200
                      focus:outline-none focus:ring-2 focus:ring-[#9a1518] focus:border-transparent
                      placeholder-gray-400 text-gray-800 transition-all duration-200"
                 value={inputMessage}
@@ -401,7 +422,7 @@ ${contextData}
             transform: translateY(0);
           }
         }
-        
+
         .animate-fadeIn {
           animation: fadeIn 0.3s ease-out;
         }
