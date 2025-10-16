@@ -293,7 +293,7 @@ ${contextData}
             {showInitialWelcomeUI ? (
               <div className="flex flex-col items-center justify-center h-full space-y-4 px-3">
                 <div className="relative">
-                  <div className="w-20 h-20 bg-gradient-to-br from-[#9a1518] to-[#c41e22] rounded-2xl flex items-center justify-center shadow-xl rotate-6 hover:rotate-12 transition-transform duration-300">
+                  <div className="mt-2 w-20 h-20 bg-gradient-to-br from-[#9a1518] to-[#c41e22] rounded-2xl flex items-center justify-center shadow-xl rotate-6 hover:rotate-12 transition-transform duration-300">
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
                     </svg>
