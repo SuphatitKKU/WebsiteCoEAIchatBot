@@ -6,8 +6,8 @@ const ChatButton = () => {
   const [messages, setMessages] = useState([]);
   const [inputMessage, setInputMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [courseCoEData, setCourseCoEData] = useState(''); // Renamed for clarity
-  const [courseDMEData, setCourseDMEData] = useState(''); // New state for DME data
+  const [courseCoEData, setCourseCoEData] = useState('');
+  const [courseDMEData, setCourseDMEData] = useState('');
   const chatContentRef = useRef(null);
   
   const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
@@ -18,19 +18,16 @@ const ChatButton = () => {
   const focusRingColor = 'focus:ring-[#9a1518]';
 
   useEffect(() => {
-    // Fetch CoE Course Data
     fetch('/WebsiteCoEAIchatBot/data/course_coe.txt')
       .then(res => res.text())
       .then(text => setCourseCoEData(text))
       .catch(err => console.error('Error loading CoE course knowledge:', err));
 
-    // Fetch DME Course Data (New!)
     fetch('/WebsiteCoEAIchatBot/data/course_dme.txt')
       .then(res => res.text())
       .then(text => setCourseDMEData(text))
       .catch(err => console.error('Error loading DME course knowledge:', err));
 
-    // Add initial AI welcome message
     if (messages.length === 0) {
       setMessages([
         { 
@@ -111,7 +108,6 @@ const ChatButton = () => {
                                      lowerCaseText.includes('ใครสอน');
 
     let contextData = '';
-    // Combine both course data if relevant
     if ((courseCoEData || courseDMEData) && isCourseOrTeacherRelated) {
       contextData = `
 ข้อมูลหลักสูตรและวิชาเรียน รวมถึงอาจารย์ผู้สอน:
@@ -235,9 +231,15 @@ ${contextData}
       {/* Floating Chat Button */}
       <button
         onClick={toggleChat}
-        className={`fixed bottom-6 right-6 ${primaryColor} ${primaryHoverColor} text-white p-5 rounded-full shadow-2xl z-50 
+        className={`fixed z-50 p-5 rounded-full shadow-2xl
+                   ${primaryColor} ${primaryHoverColor} text-white
                    focus:outline-none focus:ring-4 ${focusRingColor} focus:ring-opacity-50
-                   transition-all duration-300 hover:scale-110 active:scale-95 hover:shadow-[0_0_30px_rgba(154,21,24,0.5)]`}
+                   transition-all duration-300 hover:scale-110 active:scale-95 hover:shadow-[0_0_30px_rgba(154,21,24,0.5)]
+                   bottom-6 right-6 /* default for mobile */
+                   sm:bottom-8 sm:right-8 /* slightly larger for small tablets */
+                   md:bottom-10 md:right-10 /* larger for tablets/desktops */
+                   lg:bottom-12 lg:right-12 /* even larger for large desktops */
+                   `}
       >
         <svg xmlns="http://www.w3.org/2000/svg"
              className={`h-7 w-7 transition-transform duration-300 ${isOpen ? 'rotate-90' : 'rotate-0'}`}
@@ -254,12 +256,17 @@ ${contextData}
 
       {/* Chat Window */}
       {isVisible && (
-        <div className={`fixed bottom-24 right-6 z-50 flex flex-col
-                        w-[calc(100vw-3rem)] max-w-[460px] /* เพิ่ม max-w ที่นี่ */
-                        h-[calc(100vh-180px)] sm:h-[500px] md:h-[580px] lg:h-[650px]
+        <div className={`fixed z-50 flex flex-col
+                        w-[calc(100vw-24px)] max-w-[min(460px, calc(100vw-24px))] /* Adjust max-width and dynamic width */
+                        h-[calc(100vh-140px)] sm:h-[500px] md:h-[580px] lg:h-[650px] /* Adjust height to prevent overflow */
                         rounded-2xl shadow-[0_20px_60px_rgba(0,0,0,0.3)]
                         transition-all duration-300 ease-out origin-bottom-right overflow-hidden
-                        ${isOpen ? 'opacity-100 scale-100 translate-y-0' : 'opacity-0 scale-95 translate-y-4'}`}
+                        ${isOpen ? 'opacity-100 scale-100 translate-y-0' : 'opacity-0 scale-95 translate-y-4'}
+                        bottom-20 right-3 /* Adjusted for better spacing on small screens */
+                        sm:bottom-24 sm:right-6
+                        md:bottom-28 md:right-8
+                        lg:bottom-32 lg:right-10
+                        `}
              style={{
                background: 'rgba(255, 255, 255, 0.5)',
                backdropFilter: 'blur(20px) saturate(180%)',
@@ -432,6 +439,11 @@ ${contextData}
 
         *::-webkit-scrollbar-thumb:hover {
           background: rgba(154, 21, 24, 0.7);
+        }
+
+        /* Ensure no body overflow for elements that might push content */
+        body {
+          overflow-x: hidden;
         }
       `}</style>
     </>
