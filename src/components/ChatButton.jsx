@@ -270,11 +270,9 @@ ${contextData}
                backdropFilter: 'blur(20px) saturate(180%)',
                WebkitBackdropFilter: 'blur(20px) saturate(180%)',
                border: '1px solid rgba(255, 255, 255, 0.2)',
-               // กำหนดขนาดสำหรับแท็บเล็ตและหน้าจอขนาดกลางโดยเฉพาะ
-               width: 'min(360px, calc(100vw - 24px))', // ลด max-width เหลือ 360px
-               height: 'min(500px, calc(100vh - 140px))', // ลด max-height เหลือ 500px
-               // Tailwind responsive classes will override these for larger screens if defined.
-               // For MD and above, we can use Tailwind classes directly, or let these serve as max values.
+               // ปรับขนาดให้เล็กลงมากยิ่งขึ้น
+               width: 'min(300px, calc(100vw - 24px))', // ลด max-width เป็น 300px
+               height: 'min(400px, calc(100vh - 140px))', // ลด max-height เป็น 400px
              }}>
           
           {/* Header with Gradient */}
