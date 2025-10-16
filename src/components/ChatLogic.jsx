@@ -1,7 +1,50 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 
 const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
+// URL for content generation
 const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent';
+// URL for embedding generation (using text-embedding-004 model)
+const EMBEDDING_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/text-embedding-004:embedContent';
+
+// --- Utility functions for chunking and vector similarity (You can put these in a separate file) ---
+// Note: For a real-world app, consider using a dedicated library for text splitting and vector operations.
+
+// Simple chunking function
+const chunk = (text, chunkSize = 500, overlap = 100) => {
+  const words = text.split(/\s+/); // Split by whitespace
+  const chunks = [];
+  let i = 0;
+  while (i < words.length) {
+    let currentChunk = words.slice(i, i + chunkSize).join(' ');
+    chunks.push(currentChunk);
+    if (i + chunkSize >= words.length) break;
+    i += chunkSize - overlap; // Move window for overlap
+    if (i < 0) i = 0; // Ensure i doesn't go negative
+  }
+  return chunks;
+};
+
+// Calculates cosine similarity between two vectors
+const cosineSimilarity = (vecA, vecB) => {
+  if (!vecA || !vecB || vecA.length === 0 || vecB.length === 0 || vecA.length !== vecB.length) {
+    return 0;
+  }
+  let dotProduct = 0;
+  let magnitudeA = 0;
+  let magnitudeB = 0;
+  for (let i = 0; i < vecA.length; i++) {
+    dotProduct += vecA[i] * vecB[i];
+    magnitudeA += vecA[i] * vecA[i];
+    magnitudeB += vecB[i] * vecB[i];
+  }
+  magnitudeA = Math.sqrt(magnitudeA);
+  magnitudeB = Math.sqrt(magnitudeB);
+  if (magnitudeA === 0 || magnitudeB === 0) return 0;
+  return dotProduct / (magnitudeA * magnitudeB);
+};
+
+// --- End of Utility functions ---
+
 
 export const useChatLogic = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -10,9 +53,13 @@ export const useChatLogic = () => {
   const [inputMessage, setInputMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
-  // Data for course knowledge base
+  // Data for course knowledge base (raw text)
   const [courseCoEData, setCourseCoEData] = useState('');
   const [courseDMEData, setCourseDMEData] = useState('');
+
+  // Store embeddings for course data
+  // Format: [{ text: "chunk content", embedding: [...] }, ...]
+  const [courseEmbeddings, setCourseEmbeddings] = useState([]);
 
   // Ref for scrolling chat content (can be passed to UI)
   const chatContentRef = useRef(null);
@@ -32,6 +79,74 @@ export const useChatLogic = () => {
       console.error(`Error loading course knowledge from ${path}:`, err);
     }
   }, []);
+
+  // Generates an embedding for a given text using Gemini's Embedding API
+  const generateEmbedding = useCallback(async (text) => {
+    try {
+      const response = await fetch(EMBEDDING_API_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-goog-api-key': GEMINI_API_KEY,
+        },
+        body: JSON.stringify({
+          model: "text-embedding-004", // Specify the embedding model
+          content: {
+            parts: [{ text: text }],
+          },
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Embedding API error ${response.status}: ${await response.text()}`);
+      }
+
+      const data = await response.json();
+      return data.embedding.values; // Return the embedding vector
+    } catch (error) {
+      console.error("Error generating embedding:", error);
+      return null;
+    }
+  }, [GEMINI_API_KEY]);
+
+  // Processes raw course data, chunks it, and generates embeddings for each chunk
+  const processAndEmbedCourseData = useCallback(async (coeText, dmeText) => {
+    const allEmbeddings = [];
+
+    const processText = async (data, courseName) => {
+      if (!data) return;
+      const chunks = chunk(data); // Using the local chunk function
+      for (const ch of chunks) {
+        const embedding = await generateEmbedding(ch);
+        if (embedding) {
+          allEmbeddings.push({ text: ch, embedding, course: courseName });
+        }
+      }
+    };
+
+    await processText(coeText, 'วิศวกรรมคอมพิวเตอร์');
+    await processText(dmeText, 'สื่อดิจิตอล');
+
+    setCourseEmbeddings(allEmbeddings);
+    console.log(`Processed ${allEmbeddings.length} course knowledge chunks.`);
+  }, [generateEmbedding]);
+
+  // Finds the most relevant chunks based on user query embedding
+  const getRelevantContext = useCallback(async (userQueryEmbedding, topK = 3) => {
+    if (!userQueryEmbedding || courseEmbeddings.length === 0) {
+      return [];
+    }
+
+    const scores = courseEmbeddings.map(item => ({
+      ...item,
+      similarity: cosineSimilarity(userQueryEmbedding, item.embedding),
+    }));
+
+    // Sort by similarity and get top K
+    scores.sort((a, b) => b.similarity - a.similarity);
+    return scores.slice(0, topK).filter(item => item.similarity > 0.5); // Filter by a threshold
+  }, [courseEmbeddings]);
+
 
   // Formats AI response with basic Markdown-like syntax
   const formatAIResponse = useCallback((text) => {
@@ -71,6 +186,14 @@ export const useChatLogic = () => {
     fetchCourseData('/WebsiteCoEAIchatBot/data/course_coe.txt', setCourseCoEData);
     fetchCourseData('/WebsiteCoEAIchatBot/data/course_dme.txt', setCourseDMEData);
   }, [fetchCourseData]);
+
+  // Effect to process and embed course data once raw data is loaded
+  useEffect(() => {
+    if (courseCoEData || courseDMEData) {
+      processAndEmbedCourseData(courseCoEData, courseDMEData);
+    }
+  }, [courseCoEData, courseDMEData, processAndEmbedCourseData]);
+
 
   // Effect to add initial AI welcome message once
   useEffect(() => {
@@ -129,11 +252,19 @@ export const useChatLogic = () => {
       lowerCaseText.includes('ใครสอน');
 
     let contextData = '';
-    if ((courseCoEData || courseDMEData) && isCourseOrTeacherRelated) {
-      contextData = `ข้อมูลหลักสูตรและวิชาเรียน รวมถึงอาจารย์ผู้สอน:
-${courseCoEData ? `--- หลักสูตรวิศวกรรมคอมพิวเตอร์ ---\n${courseCoEData}` : ''}
-${courseDMEData ? `--- หลักสูตรสื่อดิจิตอล ---\n${courseDMEData}` : ''}
-กรุณาตอบคำถามโดยอ้างอิงจากข้อมูลด้านบนเป็นหลัก ถ้าคำถามไม่เกี่ยวข้องกับข้อมูลที่มี ให้ตอบตามความรู้ทั่วไปแต่แจ้งให้ผู้ใช้ทราบว่าข้อมูลนี้ไม่ได้มาจากฐานข้อมูลหลักสูตร`;
+    let foundRelevantContext = false; // Flag to check if context was found
+
+    if (isCourseOrTeacherRelated && courseEmbeddings.length > 0) {
+      const userQueryEmbedding = await generateEmbedding(text);
+      if (userQueryEmbedding) {
+        const relevantChunks = await getRelevantContext(userQueryEmbedding, 3); // Get top 3 relevant chunks
+        if (relevantChunks.length > 0) {
+          foundRelevantContext = true;
+          contextData = `ข้อมูลที่เกี่ยวข้องจากหลักสูตรและวิชาเรียน:
+${relevantChunks.map(chunk => `--- ข้อมูลจาก ${chunk.course} ---\n${chunk.text}`).join('\n\n')}
+`;
+        }
+      }
     }
 
     const MAX_HISTORY_MESSAGES = 8;
@@ -145,10 +276,27 @@ ${courseDMEData ? `--- หลักสูตรสื่อดิจิตอล
         parts: [{ text: msg.text }]
       }));
 
-    const combinedUserPromptText = `${baseSystemInstruction}
-${contextData ? `${contextData}\n\n` : ''}คำถาม: ${text}`;
+    let finalPromptText = `${baseSystemInstruction}`;
 
-    const contentsToSend = [...historyForAPI, { role: 'user', parts: [{ text: combinedUserPromptText }] }];
+    if (foundRelevantContext) {
+      finalPromptText += `
+${contextData}
+กรุณาตอบคำถามโดยอ้างอิงจากข้อมูลด้านบนเป็นหลัก
+หากข้อมูลด้านบนไม่เพียงพอหรือไม่เกี่ยวข้อง ให้ตอบตามความรู้ทั่วไปและ **แจ้งให้ผู้ใช้ทราบว่าข้อมูลนี้ไม่ได้มาจากฐานข้อมูลหลักสูตร**`;
+    } else if (isCourseOrTeacherRelated) {
+        // If it's course-related but no relevant chunks found, tell AI to use general knowledge
+        finalPromptText += `
+**ไม่พบข้อมูลที่เกี่ยวข้องโดยตรงในฐานข้อมูลหลักสูตรสำหรับคำถามนี้.**
+กรุณาตอบตามความรู้ทั่วไปและ **แจ้งให้ผู้ใช้ทราบว่าข้อมูลนี้ไม่ได้มาจากฐานข้อมูลหลักสูตร**`;
+    } else {
+        // Not course related, just use general knowledge
+        finalPromptText += `
+กรุณาตอบตามความรู้ทั่วไป`;
+    }
+
+    finalPromptText += `\n\nคำถาม: ${text}`;
+
+    const contentsToSend = [...historyForAPI, { role: 'user', parts: [{ text: finalPromptText }] }];
 
     const MAX_RETRIES = 3;
     let attempts = 0;
@@ -205,7 +353,7 @@ ${contextData ? `${contextData}\n\n` : ''}คำถาม: ${text}`;
 
     setMessages(prev => [...prev, { sender: 'ai', text: geminiResponse }]);
     setIsLoading(false);
-  }, [courseCoEData, courseDMEData, messages, GEMINI_API_KEY, GEMINI_API_URL]);
+  }, [courseEmbeddings, messages, generateEmbedding, getRelevantContext, GEMINI_API_KEY, GEMINI_API_URL]);
 
   // Handler for sending message
   const handleSendMessage = () => {
