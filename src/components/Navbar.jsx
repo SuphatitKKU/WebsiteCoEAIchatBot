@@ -80,7 +80,7 @@ export const Navbar = () => {
           ${sidebarOpen ? 'w-72' : 'w-0'}
           overflow-hidden transition-all duration-300 ease-in-out
           bg-primary text-white min-h-screen flex flex-col pt-16
-          lg:hidden`} {/* เพิ่ม lg:hidden เพื่อซ่อนใน desktop */}
+          lg:hidden` /* This is the corrected line */ }
       >
         <img
           src={assets.close_icon}
@@ -159,7 +159,7 @@ export const Navbar = () => {
         {/* Mobile Menu Button - แสดงตามค่าเริ่มต้นและซ่อนเฉพาะบนหน้าจอขนาดใหญ่ (lg ขึ้นไป) */}
         <button
           onClick={() => setSidebarOpen(true)}
-          className='p-2 hover:bg-black/10 rounded-lg transition-colors lg:hidden' {/* เพิ่ม lg:hidden */}
+          className='p-2 hover:bg-black/10 rounded-lg transition-colors lg:hidden'
           aria-label="Open menu"
         >
           <img
@@ -172,7 +172,7 @@ export const Navbar = () => {
         {/* Desktop CTA Button - ซ่อนตามค่าเริ่มต้นและแสดงเฉพาะบนหน้าจอขนาดใหญ่ (lg ขึ้นไป) */}
         <Link
           to="/feedback"
-          className='hidden lg:flex items-center gap-2 {/* เปลี่ยน md:flex เป็น lg:flex */}
+          className='hidden lg:flex items-center gap-2
                      bg-primary text-white px-4 py-2 lg:px-6 lg:py-3 rounded-full
                      cursor-pointer hover:scale-105 hover:bg-primary/90 
                      transition-all font-medium text-sm lg:text-base
