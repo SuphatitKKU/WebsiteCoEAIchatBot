@@ -3,155 +3,223 @@ import React, { useState, useEffect, useRef } from 'react';
 const ChatButton = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
-  const [messages, setMessages] = useState([]); // Stores chat messages
-  const [inputMessage, setInputMessage] = useState(''); // Stores current input
-  const [isLoading, setIsLoading] = useState(false); // To show loading state
-  const chatContentRef = useRef(null); // Ref for scrolling to bottom
-
-  // Replace with your actual API key
-  // **สำคัญ:** ไม่ควรเก็บ API Key ไว้ในโค้ดฝั่ง Client แบบนี้
-  // ควรใช้ Backend เพื่อเรียก API และซ่อน API Key ไว้
-  // หากจำเป็นต้องใช้ใน Client แนะนำให้ตั้งค่าผ่าน environment variables และ process.env.REACT_APP_GEMINI_API_KEY
-  const GEMINI_API_KEY = "AIzaSyCau2OL5taEycCyaeHSygoraPnw96LQU7I"; 
-  // Updated to use Gemini 2.0 Flash model
+  const [messages, setMessages] = useState([]);
+  const [inputMessage, setInputMessage] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [courseCoEData, setCourseCoEData] = useState(''); // Renamed for clarity
+  const [courseDMEData, setCourseDMEData] = useState(''); // New state for DME data
+  const chatContentRef = useRef(null);
+  
+  const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
   const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent`;
 
   const primaryColor = 'bg-[#9a1518]';
   const primaryHoverColor = 'hover:bg-[#7e1214]';
   const focusRingColor = 'focus:ring-[#9a1518]';
 
-  // Pre-defined responses for specific questions
-  const predefinedResponses = {
-    webDevelopmentCourse: {
-      keywords: ['เขียนเว็บ', 'ทำเว็บ', 'พัฒนาเว็บ', 'web', 'เว็บไซต์', 'วิชาเลือก', 'ลงวิชา'],
-      response: 'ตอนปีสามจะมีวิชาเลือกคือ **EN813701 Web Application Development** หากคุณชอบเขียนเว็บแนะนำให้ลงวิชานี้เพราะจะเป็นการสอนการสร้างเว็บไซต์ตั้งแต่พื้นฐาน'
-    }
-  };
+  useEffect(() => {
+    // Fetch CoE Course Data
+    fetch('/WebsiteCoEAIchatBot/data/course_coe.txt')
+      .then(res => res.text())
+      .then(text => setCourseCoEData(text))
+      .catch(err => console.error('Error loading CoE course knowledge:', err));
 
-  // Function to check if message matches predefined responses
-  const checkPredefinedResponse = (message) => {
-    const lowerMessage = message.toLowerCase();
-    
-    // Check for web development course question
-    const webKeywords = predefinedResponses.webDevelopmentCourse.keywords;
-    const matchesWebQuestion = webKeywords.some(keyword => 
-      lowerMessage.includes(keyword.toLowerCase())
-    );
-    
-    // Additional check for specific question pattern
-    const isAskingAboutCourse = lowerMessage.includes('ควร') && 
-                               (lowerMessage.includes('ลง') || lowerMessage.includes('เรียน'));
-    
-    if (matchesWebQuestion && isAskingAboutCourse) {
-      return predefinedResponses.webDevelopmentCourse.response;
-    }
-    
-    return null;
-  };
+    // Fetch DME Course Data (New!)
+    fetch('/WebsiteCoEAIchatBot/data/course_dme.txt')
+      .then(res => res.text())
+      .then(text => setCourseDMEData(text))
+      .catch(err => console.error('Error loading DME course knowledge:', err));
 
-  const toggleChat = () => {
-    if (isOpen) {
-      // Closing animation
-      setIsOpen(false);
-      setTimeout(() => setIsVisible(false), 300);
-    } else {
-      // Opening animation
-      setIsVisible(true);
-      setTimeout(() => setIsOpen(true), 10);
+    // Add initial AI welcome message
+    if (messages.length === 0) {
+      setMessages([
+        { 
+          sender: 'ai', 
+          text: `สวัสดีครับ! ฉันคือผู้ช่วยอัจฉริยะของสาขาวิศวกรรมคอมพิวเตอร์ และ สื่อดิจิตอล มหาวิทยาลัยขอนแก่น พร้อมให้คำปรึกษาเกี่ยวกับหลักสูตรและวิชาเรียนต่างๆ มีอะไรให้ช่วยไหมครับ?`
+        }
+      ]);
     }
-  };
+  }, []); 
 
-  // Scroll to the bottom of the chat window whenever messages update
   useEffect(() => {
     if (chatContentRef.current) {
       chatContentRef.current.scrollTop = chatContentRef.current.scrollHeight;
     }
   }, [messages]);
 
-  const sendMessageToGemini = async (text) => {
-    if (!text.trim()) return; // ไม่ส่งข้อความว่างเปล่า
+  const formatAIResponse = (text) => {
+    let formatted = text.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+    const lines = formatted.split('\n');
+    let inList = false;
+    let result = [];
 
-    setIsLoading(true);
-    
-    // อัปเดตข้อความของผู้ใช้ทันที
-    setMessages((prevMessages) => [...prevMessages, { sender: 'user', text: text }]);
-    setInputMessage(''); // Clear input after sending
-
-    // Check for predefined responses first
-    const predefinedResponse = checkPredefinedResponse(text);
-    
-    if (predefinedResponse) {
-      // Use predefined response
-      setTimeout(() => {
-        setMessages((prevMessages) => [
-          ...prevMessages,
-          { sender: 'ai', text: predefinedResponse },
-        ]);
-        setIsLoading(false);
-      }, 1000); // Add slight delay to simulate AI thinking
-      return;
+    for (let line of lines) {
+      if (line.trim().startsWith('*') && !line.trim().startsWith('**')) {
+        if (!inList) {
+          result.push('<ul class="list-disc list-inside space-y-1 mt-2">');
+          inList = true;
+        }
+        const content = line.trim().substring(1).trim();
+        result.push(`<li>${content}</li>`);
+      } else {
+        if (inList) {
+          result.push('</ul>');
+          inList = false;
+        }
+        if (line.trim()) {
+          result.push(`<p class="mb-2">${line}</p>`);
+        }
+      }
     }
 
-    // If no predefined response, continue with Gemini API
-    const userMessage = { role: 'user', parts: [{ text: text }] };
+    if (inList) result.push('</ul>');
 
-    // เพิ่มข้อความทั้งหมดใน History สำหรับ Gemini API
-    const history = messages.map(msg => ({
-      role: msg.sender === 'user' ? 'user' : 'model',
-      parts: [{ text: msg.text }]
-    }));
+    return result.join('');
+  };
 
-    try {
-      const response = await fetch(GEMINI_API_URL, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-goog-api-key': GEMINI_API_KEY,
-        },
-        body: JSON.stringify({
-          contents: [
-            ...history,
-            userMessage
-          ]
-        })
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        console.error('Gemini API Error:', errorData);
-        throw new Error(`API error: ${response.status} - ${errorData.error?.message || 'Unknown error'}`);
-      }
-
-      const data = await response.json();
-      const geminiResponse = data.candidates[0]?.content?.parts[0]?.text;
-
-      if (geminiResponse) {
-        setMessages((prevMessages) => [
-          ...prevMessages,
-          { sender: 'ai', text: geminiResponse },
-        ]);
-      } else {
-        setMessages((prevMessages) => [
-          ...prevMessages,
-          { sender: 'ai', text: 'ขออภัย ไม่ได้รับคำตอบจาก AI' },
-        ]);
-      }
-      
-    } catch (error) {
-      console.error('Error sending message to Gemini:', error);
-      setMessages((prevMessages) => [
-        ...prevMessages,
-        { sender: 'ai', text: 'ขออภัย เกิดข้อผิดพลาดในการเชื่อมต่อกับ AI หรือ API Key ไม่ถูกต้อง' },
-      ]);
-    } finally {
-      setIsLoading(false);
+  const toggleChat = () => {
+    if (isOpen) {
+      setIsOpen(false);
+      setTimeout(() => setIsVisible(false), 300);
+    } else {
+      setIsVisible(true);
+      setTimeout(() => setIsOpen(true), 10);
     }
   };
 
-  const handleSendMessage = () => {
-    if (inputMessage.trim()) {
-      sendMessageToGemini(inputMessage);
+  const sendMessageToGemini = async (text) => {
+    if (!text.trim()) return;
+
+    setIsLoading(true);
+    setMessages(prev => [...prev, { sender: 'user', text }]);
+    setInputMessage('');
+
+    const baseSystemInstruction = `คุณเป็น AI ผู้ช่วยของสาขาวิศวกรรมคอมพิวเตอร์ และ สื่อดิจิตอล มหาวิทยาลัยขอนแก่น ให้คำแนะนำเกี่ยวกับหลักสูตรและวิชาเรียนต่างๆ`;
+
+    const lowerCaseText = text.toLowerCase();
+    const isCourseOrTeacherRelated = lowerCaseText.includes('หลักสูตร') || 
+                                     lowerCaseText.includes('วิชา') || 
+                                     lowerCaseText.includes('คณะ') ||
+                                     lowerCaseText.includes('เรียน') ||
+                                     lowerCaseText.includes('สาขา') ||
+                                     lowerCaseText.includes('คอมพิวเตอร์') ||
+                                     lowerCaseText.includes('ดิจิตอล') ||
+                                     lowerCaseText.includes('ภาควิชา') ||
+                                     lowerCaseText.includes('อาจารย์') ||
+                                     lowerCaseText.includes('ผู้สอน') ||
+                                     lowerCaseText.includes('ชื่ออาจารย์') ||
+                                     lowerCaseText.includes('ใครสอน');
+
+    let contextData = '';
+    // Combine both course data if relevant
+    if ((courseCoEData || courseDMEData) && isCourseOrTeacherRelated) {
+      contextData = `
+ข้อมูลหลักสูตรและวิชาเรียน รวมถึงอาจารย์ผู้สอน:
+${courseCoEData ? `--- หลักสูตรวิศวกรรมคอมพิวเตอร์ ---\n${courseCoEData}` : ''}
+${courseDMEData ? `--- หลักสูตรสื่อดิจิตอล ---\n${courseDMEData}` : ''}
+
+กรุณาตอบคำถามโดยอ้างอิงจากข้อมูลด้านบนเป็นหลัก ถ้าคำถามไม่เกี่ยวข้องกับข้อมูลที่มี ให้ตอบตามความรู้ทั่วไปแต่แจ้งให้ผู้ใช้ทราบว่าข้อมูลนี้ไม่ได้มาจากฐานข้อมูลหลักสูตร
+`;
+    } else {
+      contextData = ``; 
     }
+
+    const MAX_HISTORY_MESSAGES = 8; 
+    const historyForAPI = messages
+      .filter(msg => msg.sender === 'user' || msg.sender === 'ai')
+      .slice(Math.max(messages.length - MAX_HISTORY_MESSAGES, 0)) 
+      .map(msg => ({
+        role: msg.sender === 'user' ? 'user' : 'model',
+        parts: [{ text: msg.text }]
+      }));
+    
+    const combinedUserPromptText = `
+${baseSystemInstruction}
+
+${contextData}
+
+คำถาม: ${text}
+`;
+
+    const contentsToSend = [...historyForAPI, { role: 'user', parts: [{ text: combinedUserPromptText }] }];
+
+
+    const MAX_RETRIES = 3;
+    let attempts = 0;
+    let success = false;
+    let geminiResponse = 'ขออภัย ไม่ได้รับคำตอบจาก AI';
+
+    while (attempts < MAX_RETRIES && !success) {
+      attempts++;
+      try {
+        const response = await fetch(GEMINI_API_URL, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-goog-api-key': GEMINI_API_KEY,
+          },
+          body: JSON.stringify({
+            contents: contentsToSend, 
+            safetySettings: [ 
+              {
+                category: 'HARM_CATEGORY_HARASSMENT',
+                threshold: 'BLOCK_MEDIUM_AND_ABOVE'
+              },
+              {
+                category: 'HARM_CATEGORY_HATE_SPEECH',
+                threshold: 'BLOCK_MEDIUM_AND_ABOVE'
+              },
+              {
+                category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT',
+                threshold: 'BLOCK_MEDIUM_AND_ABOVE'
+              },
+              {
+                category: 'HARM_CATEGORY_DANGEROUS_CONTENT',
+                threshold: 'BLOCK_MEDIUM_AND_ABOVE'
+              },
+            ]
+          })
+        });
+
+        if (!response.ok) {
+          if (response.status === 429 || response.status >= 500) { 
+            console.warn(`Attempt ${attempts} failed with status ${response.status}. Retrying...`);
+            await new Promise(resolve => setTimeout(resolve, 1000 * attempts)); 
+            continue;
+          }
+          throw new Error(`API error ${response.status}: ${await response.text()}`);
+        }
+
+        const data = await response.json();
+        
+        if (data.promptFeedback && data.promptFeedback.blockReason) {
+            geminiResponse = `ข้อความของคุณถูกบล็อกโดยระบบความปลอดภัยของ AI: ${data.promptFeedback.blockReason}`;
+        } else if (data.candidates?.[0]?.finishReason === 'SAFETY') {
+             geminiResponse = `ขออภัย คำตอบของ AI ถูกบล็อกโดยระบบความปลอดภัย`;
+        } else {
+            geminiResponse = data.candidates?.[0]?.content?.parts?.[0]?.text || 'ไม่ได้รับคำตอบจาก AI ที่ถูกต้อง';
+        }
+        success = true;
+      } catch (error) {
+        console.error(`Attempt ${attempts} failed:`, error);
+        if (attempts < MAX_RETRIES) {
+          await new Promise(resolve => setTimeout(resolve, 1000 * attempts)); 
+        } else {
+          geminiResponse = `ขออภัย เกิดข้อผิดพลาดในการเชื่อมต่อกับ AI หรือ API Key ไม่ถูกต้อง: ${error.message}`;
+        }
+      }
+    }
+
+    setMessages(prev => [
+      ...prev,
+      { sender: 'ai', text: geminiResponse }
+    ]);
+
+    setIsLoading(false);
+  };
+
+  const handleSendMessage = () => {
+    if (inputMessage.trim()) sendMessageToGemini(inputMessage);
   };
 
   const handleKeyPress = (e) => {
@@ -160,222 +228,210 @@ const ChatButton = () => {
     }
   };
 
+  const showInitialWelcomeUI = messages.length === 1 && messages[0].sender === 'ai';
+
   return (
     <>
-      {/* ปุ่มแชท - พร้อม animation */}
+      {/* Floating Chat Button */}
       <button
         onClick={toggleChat}
-        className={`fixed bottom-4 right-4 ${primaryColor} ${primaryHoverColor} text-white p-4 rounded-full shadow-lg z-50 
-                   focus:outline-none focus:ring-2 ${focusRingColor} focus:ring-opacity-50
-                   transition-all duration-300 hover:scale-110 active:scale-95`}
+        className={`fixed bottom-6 right-6 ${primaryColor} ${primaryHoverColor} text-white p-5 rounded-full shadow-2xl z-50 
+                   focus:outline-none focus:ring-4 ${focusRingColor} focus:ring-opacity-50
+                   transition-all duration-300 hover:scale-110 active:scale-95 hover:shadow-[0_0_30px_rgba(154,21,24,0.5)]`}
       >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          className={`h-6 w-6 transition-transform duration-300 ${isOpen ? 'rotate-90' : 'rotate-0'}`}
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
+        <svg xmlns="http://www.w3.org/2000/svg"
+             className={`h-7 w-7 transition-transform duration-300 ${isOpen ? 'rotate-90' : 'rotate-0'}`}
+             fill="none" viewBox="0 0 24 24" stroke="currentColor">
           {isOpen ? (
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M6 18L18 6M6 6l12 12"
-            />
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5}
+                  d="M6 18L18 6M6 6l12 12" />
           ) : (
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
-            />
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5}
+                  d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
           )}
         </svg>
       </button>
 
-      {/* หน้าต่างแชท - ปรับขนาดสำหรับ Laptop (sm: เปลี่ยนจาก md เป็น sm) */}
+      {/* Chat Window */}
       {isVisible && (
-        <div 
-          className={`fixed bottom-20 right-4 z-50 flex flex-col
-                      w-11/12 sm:w-80 md:w-96 lg:w-96 xl:w-[420px] 
-                      h-[calc(100vh-300px)] sm:h-[350px] md:h-[400px] lg:h-[450px] xl:h-[500px] // <<<--- แก้ไขความสูงตรงนี้
-                      bg-white/90 backdrop-blur-xl rounded-lg shadow-2xl border border-white/30
-                      transition-all duration-300 ease-out origin-bottom-right
-                      ${isOpen 
-                        ? 'opacity-100 scale-100 translate-y-0' 
-                        : 'opacity-0 scale-95 translate-y-4'
-                      }`}
-          style={{
-            transform: isOpen 
-              ? 'translateY(0px) scale(1)' 
-              : 'translateY(16px) scale(0.95)',
-            opacity: isOpen ? 1 : 0,
-            backgroundColor: 'rgba(255, 255, 255, 0.95)',
-            backdropFilter: 'blur(20px)',
-            WebkitBackdropFilter: 'blur(20px)',
-            boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
-          }}
-        >
-          {/* Header แชท - พร้อม animation */}
-          <div className={`p-3 rounded-t-lg flex justify-between items-center ${primaryColor} text-white
-                          transform transition-all duration-300 delay-100
-                          ${isOpen ? 'translate-x-0 opacity-100' : '-translate-x-4 opacity-0'}`}>
-            <h3 className="text-lg font-semibold">CodMe Ai Chat Bot</h3>
-            <button 
-              onClick={toggleChat} 
-              className="text-white hover:text-gray-200 focus:outline-none
-                        transition-all duration-200 hover:rotate-90 hover:scale-110"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-5 w-5"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+        <div className={`fixed bottom-24 right-6 z-50 flex flex-col
+                        w-[calc(100vw-3rem)] sm:w-96 md:w-[420px] lg:w-[460px]
+                        h-[calc(100vh-180px)] sm:h-[500px] md:h-[580px] lg:h-[650px]
+                        rounded-2xl shadow-[0_20px_60px_rgba(0,0,0,0.3)]
+                        transition-all duration-300 ease-out origin-bottom-right overflow-hidden
+                        ${isOpen ? 'opacity-100 scale-100 translate-y-0' : 'opacity-0 scale-95 translate-y-4'}`}
+             style={{
+               background: 'rgba(255, 255, 255, 0.5)',
+               backdropFilter: 'blur(20px) saturate(180%)',
+               WebkitBackdropFilter: 'blur(20px) saturate(180%)',
+               border: '1px solid rgba(255, 255, 255, 0.2)',
+             }}>
+          
+          {/* Header with Gradient */}
+          <div className={`p-4 flex justify-between items-center ${primaryColor} relative overflow-hidden flex-none`}
+               style={{
+                 background: 'linear-gradient(135deg, #9a1518 0%, #c41e22 100%)',
+               }}>
+            <div className="flex items-center space-x-3 z-10">
+              <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                </svg>
+              </div>
+              <div>
+                <h3 className="text-lg font-bold text-white">CodMe AI Assistant</h3>
+                <p className="text-xs text-white/80">พร้อมให้คำปรึกษาตลอด 24 ชม.</p>
+              </div>
+            </div>
+            <button onClick={toggleChat} className="text-white/90 hover:text-white hover:bg-white/10 rounded-full p-2 transition-all duration-200 z-10">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
+            
+            {/* Decorative Elements */}
+            <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-16 translate-x-16 blur-2xl"></div>
+            <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/10 rounded-full translate-y-12 -translate-x-12 blur-2xl"></div>
           </div>
 
-          {/* เนื้อหาแชท - พร้อม slide animation และ blur background */}
-          <div 
-            ref={chatContentRef} 
-            className={`flex-grow p-4 overflow-y-auto flex flex-col space-y-3
-                       transform transition-all duration-300 delay-150
-                       ${isOpen ? 'translate-x-0 opacity-100' : 'translate-x-4 opacity-0'}`}
-            style={{
-              backgroundColor: 'rgba(249, 250, 251, 0.7)',
-              backdropFilter: 'blur(10px)',
-              WebkitBackdropFilter: 'blur(10px)',
-            }}
-          >
-            {messages.length === 0 ? (
-              <div className={`text-gray-600 text-center mt-auto space-y-2
-                            transform transition-all duration-500 delay-300
-                            ${isOpen ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'}`}>
-                <p>สวัสดี! มีอะไรให้ช่วยไหม?</p>
-                <p className="text-sm text-gray-500">ลองถามเกี่ยวกับวิชาเลือกสำหรับคนที่ชอบเขียนเว็บดูสิ</p>
-              </div>
-            ) : (
-              messages.map((msg, index) => (
-                <div
-                  key={index}
-                  className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}
-                             transform transition-all duration-300 ease-out
-                             ${isOpen ? 'translate-y-0 opacity-100' : 'translate-y-2 opacity-0'}`}
-                  style={{
-                    transitionDelay: `${200 + index * 50}ms`
-                  }}
-                >
-                  <div
-                    className={`max-w-[75%] p-2 rounded-lg shadow-lg transition-all duration-200 hover:scale-105 ${
-                      msg.sender === 'user'
-                        ? `${primaryColor} text-white hover:shadow-xl backdrop-blur-sm`
-                        : 'bg-white/80 text-gray-800 hover:bg-white/90 backdrop-blur-sm border border-white/30'
-                    }`}
-                    style={{
-                      backdropFilter: 'blur(8px)',
-                      WebkitBackdropFilter: 'blur(8px)',
-                    }}
-                  >
-                    {msg.text}
+          {/* Chat Content */}
+          <div ref={chatContentRef} className="flex-grow p-5 overflow-y-auto flex flex-col space-y-4 min-h-0">
+            {showInitialWelcomeUI ? (
+              <div className="flex flex-col items-center justify-center h-full space-y-6 px-4">
+                <div className="relative">
+                  <div className="w-24 h-24 bg-gradient-to-br from-[#9a1518] to-[#c41e22] rounded-3xl flex items-center justify-center shadow-xl rotate-6 hover:rotate-12 transition-transform duration-300">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+                    </svg>
                   </div>
+                  <div className="absolute -top-2 -right-2 w-6 h-6 bg-green-400 rounded-full border-4 border-white animate-pulse"></div>
+                </div>
+                
+                <div className="text-center space-y-3">
+                  <h4 className="text-2xl font-bold text-gray-800">ยินดีต้อนรับ! 👋</h4>
+                  <p className="text-gray-600 text-base leading-relaxed max-w-xs">
+                    ฉันคือผู้ช่วยอัจฉริยะของสาขาวิศวกรรมคอมพิวเตอร์ และ สื่อดิจิตอล<br/>
+                    <span className="text-[#9a1518] font-semibold">มหาวิทยาลัยขอนแก่น</span>
+                  </p>
+                </div>
+
+                <div className="w-full max-w-xs space-y-2">
+                  <p className="text-sm text-gray-500 text-center font-medium">คำถามแนะนำ:</p>
+                  <div className="space-y-2">
+                    <button 
+                      onClick={() => setInputMessage('วิชาเลือกสำหรับคนที่ชอบเขียนเว็บมีอะไรบ้าง')}
+                      className="w-full p-3 bg-white/60 hover:bg-white/80 backdrop-blur-sm rounded-xl text-sm text-gray-700 text-left transition-all duration-200 border border-gray-200 hover:border-[#9a1518] hover:shadow-md"
+                    >
+                      💻 วิชาเลือกสำหรับคนที่ชอบเขียนเว็บ
+                    </button>
+                    <button 
+                      onClick={() => setInputMessage('หลักสูตรของคณะมีอะไรบ้าง')}
+                      className="w-full p-3 bg-white/60 hover:bg-white/80 backdrop-blur-sm rounded-xl text-sm text-gray-700 text-left transition-all duration-200 border border-gray-200 hover:border-[#9a1518] hover:shadow-md"
+                    >
+                      📚 หลักสูตรของคณะมีอะไรบ้าง
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ) : ( 
+              messages.map((msg, index) => (
+                <div key={index} className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'} animate-fadeIn`}>
+                  <div
+                    className={`max-w-[80%] p-3 rounded-2xl shadow-lg transition-all duration-200 hover:shadow-xl ${
+                      msg.sender === 'user'
+                        ? 'bg-gradient-to-br from-[#9a1518] to-[#c41e22] text-white rounded-br-sm'
+                        : 'bg-white/80 backdrop-blur-sm text-gray-800 border border-white/50 rounded-bl-sm'
+                    }`}
+                    dangerouslySetInnerHTML={{
+                      __html: msg.sender === 'ai' ? formatAIResponse(msg.text) : msg.text
+                    }}
+                  />
                 </div>
               ))
             )}
             {isLoading && (
-              <div className="flex justify-start">
-                <div 
-                  className="bg-white/80 text-gray-800 p-2 rounded-lg shadow-lg animate-pulse
-                             transform transition-all duration-300 slide-in-left backdrop-blur-sm border border-white/30"
-                  style={{
-                    backdropFilter: 'blur(8px)',
-                    WebkitBackdropFilter: 'blur(8px)',
-                  }}
-                >
-                  <div className="flex space-x-1">
-                    <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce"></div>
-                    <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
-                    <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
-                  </div>
+              <div className="flex justify-start animate-fadeIn">
+                <div className="bg-white/80 backdrop-blur-sm text-gray-800 p-4 rounded-2xl rounded-bl-sm shadow-lg border border-white/50 flex space-x-2">
+                  <div className="w-2.5 h-2.5 bg-[#9a1518] rounded-full animate-bounce"></div>
+                  <div className="w-2.5 h-2.5 bg-[#9a1518] rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
+                  <div className="w-2.5 h-2.5 bg-[#9a1518] rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
                 </div>
               </div>
             )}
           </div>
 
-          {/* Input สำหรับพิมพ์ข้อความ - พร้อม slide animation และ blur effect */}
-          <div 
-            className={`p-3 flex space-x-3
-                        transform transition-all duration-300 delay-200
-                        ${isOpen ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'}`}
-            style={{
-              backgroundColor: 'rgba(255, 255, 255, 0.8)',
-              backdropFilter: 'blur(10px)',
-              WebkitBackdropFilter: 'blur(10px)',
-              borderTop: '1px solid rgba(255, 255, 255, 0.3)',
-            }}
-          >
-            <input
-              type="text"
-              placeholder="พิมพ์ข้อความของคุณ..."
-              className={`flex-grow p-2 rounded-md 
-                         focus:outline-none focus:ring-2 ${focusRingColor}
-                         transition-all duration-200 focus:scale-105 focus:shadow-lg
-                         bg-white/60 backdrop-blur-sm border border-white/40 text-gray-800
-                         placeholder-gray-500`}
-              style={{
-                backdropFilter: 'blur(8px)',
-                WebkitBackdropFilter: 'blur(8px)',
-              }}
-              value={inputMessage}
-              onChange={(e) => setInputMessage(e.target.value)}
-              onKeyPress={handleKeyPress}
-              disabled={isLoading}
-            />
-            <button
-              onClick={handleSendMessage}
-              className={`flex-shrink-0 ${primaryColor} ${primaryHoverColor} text-white py-2 px-4 rounded-md 
-                         focus:outline-none focus:ring-2 ${focusRingColor} focus:ring-opacity-50
-                         transition-all duration-200 hover:scale-105 hover:shadow-xl active:scale-95
-                         backdrop-blur-sm
-                         ${isLoading || !inputMessage.trim() ? 'opacity-50 cursor-not-allowed' : ''}`}
-              style={{
-                backdropFilter: 'blur(8px)',
-                WebkitBackdropFilter: 'blur(8px)',
-              }}
-              disabled={isLoading || !inputMessage.trim()}
-            >
-              <span className="transition-all duration-200">
+          {/* Input Area */}
+          <div className="p-4 border-t border-white/30"
+               style={{
+                 background: 'rgba(255, 255, 255, 0.3)',
+                 backdropFilter: 'blur(10px)',
+                 WebkitBackdropFilter: 'blur(10px)',
+               }}>
+            <div className="flex space-x-2">
+              <input
+                type="text"
+                placeholder="พิมพ์ข้อความของคุณที่นี่..."
+                className="flex-grow px-4 py-3 rounded-xl bg-white/70 backdrop-blur-sm border border-gray-200 
+                         focus:outline-none focus:ring-2 focus:ring-[#9a1518] focus:border-transparent
+                         placeholder-gray-400 text-gray-800 transition-all duration-200"
+                value={inputMessage}
+                onChange={(e) => setInputMessage(e.target.value)}
+                onKeyPress={handleKeyPress}
+                disabled={isLoading}
+              />
+              <button
+                onClick={handleSendMessage}
+                className={`${primaryColor} ${primaryHoverColor} text-white p-3 rounded-xl shadow-lg
+                          transition-all duration-200 hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed
+                          hover:scale-105 active:scale-95 min-w-[52px] flex items-center justify-center`}
+                disabled={isLoading || !inputMessage.trim()}
+              >
                 {isLoading ? (
-                  <svg className="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="m4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                  </svg>
+                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                 ) : (
-                  'ส่ง'
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                  </svg>
                 )}
-              </span>
-            </button>
+              </button>
+            </div>
           </div>
         </div>
       )}
 
-      <style jsx>{`
-        .slide-in-left {
-          animation: slideInLeft 0.3s ease-out;
-        }
-        
-        @keyframes slideInLeft {
+      <style>{`
+        @keyframes fadeIn {
           from {
-            transform: translateX(-20px);
             opacity: 0;
+            transform: translateY(10px);
           }
           to {
-            transform: translateX(0);
             opacity: 1;
+            transform: translateY(0);
           }
+        }
+        
+        .animate-fadeIn {
+          animation: fadeIn 0.3s ease-out;
+        }
+
+        /* Custom Scrollbar */
+        *::-webkit-scrollbar {
+          width: 6px;
+        }
+
+        *::-webkit-scrollbar-track {
+          background: rgba(255, 255, 255, 0.1);
+          border-radius: 10px;
+        }
+
+        *::-webkit-scrollbar-thumb {
+          background: rgba(154, 21, 24, 0.5);
+          border-radius: 10px;
+        }
+
+        *::-webkit-scrollbar-thumb:hover {
+          background: rgba(154, 21, 24, 0.7);
         }
       `}</style>
     </>

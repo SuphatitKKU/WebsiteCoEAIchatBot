@@ -26,8 +26,9 @@ export const Navbar = () => {
         />
       </Link>
 
-      {/* Desktop Menu */}
-      <div className='hidden sm:flex items-center gap-6 lg:gap-8 text-gray-700 text-base lg:text-lg'>
+      {/* Desktop Menu - จะซ่อนเมื่อเป็น Tablet แนวตั้ง หรือ Mobile */}
+      {/* ใช้ md:flex เพื่อให้แสดงบน Desktop/Tablet แนวนอน แต่ซ่อนใน Mobile/Tablet แนวตั้ง */}
+      <div className='hidden md:flex items-center gap-6 lg:gap-8 text-gray-700 text-base lg:text-lg'>
         <Link 
           to="/" 
           className={`hover:text-primary transition-colors ${
@@ -74,9 +75,10 @@ export const Navbar = () => {
         </Link>
       </div>
 
-      {/* Mobile Sidebar */}
+      {/* Mobile Sidebar - จะแสดงเมื่อเป็น Tablet แนวตั้ง หรือ Mobile */}
+      {/* ใช้ md:hidden เพื่อซ่อนใน Desktop/Tablet แนวนอน แต่แสดงใน Mobile/Tablet แนวตั้ง */}
       <div
-        className={`sm:hidden fixed top-0 bottom-0 right-0 z-50
+        className={`md:hidden fixed top-0 bottom-0 right-0 z-50
           ${sidebarOpen ? 'w-72' : 'w-0'}
           overflow-hidden transition-all duration-300 ease-in-out
           bg-primary text-white min-h-screen flex flex-col pt-16`}
@@ -155,10 +157,11 @@ export const Navbar = () => {
 
       {/* Right Side - Desktop Button & Mobile Menu Icon */}
       <div className='flex items-center gap-3 relative z-10'>
-        {/* Mobile Menu Button */}
+        {/* Mobile Menu Button - จะแสดงเมื่อเป็น Tablet แนวตั้ง หรือ Mobile */}
+        {/* ใช้ md:hidden เพื่อซ่อนใน Desktop/Tablet แนวนอน แต่แสดงใน Mobile/Tablet แนวตั้ง */}
         <button
           onClick={() => setSidebarOpen(true)}
-          className='sm:hidden p-2 hover:bg-black/10 rounded-lg transition-colors'
+          className='md:hidden p-2 hover:bg-black/10 rounded-lg transition-colors'
           aria-label="Open menu"
         >
           <img
@@ -168,10 +171,11 @@ export const Navbar = () => {
           />
         </button>
 
-        {/* Desktop CTA Button */}
+        {/* Desktop CTA Button - จะซ่อนเมื่อเป็น Tablet แนวตั้ง หรือ Mobile */}
+        {/* ใช้ md:flex เพื่อให้แสดงบน Desktop/Tablet แนวนอน แต่ซ่อนใน Mobile/Tablet แนวตั้ง */}
         <Link
           to="/feedback"
-          className='hidden sm:flex items-center gap-2
+          className='hidden md:flex items-center gap-2
                      bg-primary text-white px-4 py-2 lg:px-6 lg:py-3 rounded-full
                      cursor-pointer hover:scale-105 hover:bg-primary/90 
                      transition-all font-medium text-sm lg:text-base
@@ -180,7 +184,6 @@ export const Navbar = () => {
           ข้อเสนอแนะ →
         </Link>
       </div>
-      {/* Mobile Backdrop ถูกลบออกแล้ว */}
     </div>
   )
 }
