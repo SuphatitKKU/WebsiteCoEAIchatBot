@@ -8,7 +8,7 @@ const ChatButton = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [courseCoEData, setCourseCoEData] = useState('');
   const [courseDMEData, setCourseDMEData] = useState('');
-  const [isTablet, setIsTablet] = useState(false); // New state for tablet detection
+  const [isTablet, setIsTablet] = useState(false);
   const chatContentRef = useRef(null);
 
   const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
@@ -41,22 +41,18 @@ const ChatButton = () => {
       ]);
     }
 
-    // --- Tablet detection logic ---
     const checkTablet = () => {
-      // For simplicity, defining "tablet" as screens between 640px and 1024px
-      // This can be adjusted based on specific device definitions or design
       setIsTablet(window.matchMedia('(min-width: 640px) and (max-width: 1024px)').matches);
     };
 
-    checkTablet(); // Check on initial mount
-    window.addEventListener('resize', checkTablet); // Add listener for resize events
+    checkTablet();
+    window.addEventListener('resize', checkTablet);
 
     return () => {
-      window.removeEventListener('resize', checkTablet); // Clean up listener
+      window.removeEventListener('resize', checkTablet);
     };
-    // --- End tablet detection logic ---
 
-  }, []); // Empty dependency array means this runs once on mount
+  }, []);
 
   useEffect(() => {
     if (chatContentRef.current) {
@@ -240,9 +236,10 @@ ${contextData}
   const showInitialWelcomeUI = messages.length === 1 && messages[0].sender === 'ai';
 
   // Determine chatbox height based on isTablet state
-  const chatboxHeightClass = isTablet 
-    ? 'h-[calc(100vh-280px)] sm:h-[350px] md:h-[400px] lg:h-[450px]' // Shorter for tablets
-    : 'h-[calc(100vh-250px)] sm:h-[400px] md:h-[480px] lg:h-[550px]'; // Original height for larger screens
+  // ปรับค่าความสูงตรงนี้เพื่อลดขนาดลง
+  const chatboxHeightClass = isTablet
+    ? 'h-[calc(100vh-350px)] sm:h-[300px] md:h-[350px] lg:h-[400px]' // สั้นลงไปอีกสำหรับ tablets
+    : 'h-[calc(100vh-280px)] sm:h-[380px] md:h-[450px] lg:h-[500px]'; // ลดความสูงสำหรับจอปกติ (จากเดิม 550px)
 
   return (
     <>
