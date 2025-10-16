@@ -257,8 +257,6 @@ ${contextData}
       {/* Chat Window */}
       {isVisible && (
         <div className={`fixed z-50 flex flex-col
-                        w-[calc(100vw-24px)] max-w-[min(460px, calc(100vw-24px))] /* Adjust max-width and dynamic width */
-                        h-[calc(100vh-140px)] sm:h-[500px] md:h-[580px] lg:h-[650px] /* Adjust height to prevent overflow */
                         rounded-2xl shadow-[0_20px_60px_rgba(0,0,0,0.3)]
                         transition-all duration-300 ease-out origin-bottom-right overflow-hidden
                         ${isOpen ? 'opacity-100 scale-100 translate-y-0' : 'opacity-0 scale-95 translate-y-4'}
@@ -272,6 +270,11 @@ ${contextData}
                backdropFilter: 'blur(20px) saturate(180%)',
                WebkitBackdropFilter: 'blur(20px) saturate(180%)',
                border: '1px solid rgba(255, 255, 255, 0.2)',
+               // กำหนดขนาดสำหรับแท็บเล็ตและหน้าจอขนาดกลางโดยเฉพาะ
+               width: 'min(360px, calc(100vw - 24px))', // ลด max-width เหลือ 360px
+               height: 'min(500px, calc(100vh - 140px))', // ลด max-height เหลือ 500px
+               // Tailwind responsive classes will override these for larger screens if defined.
+               // For MD and above, we can use Tailwind classes directly, or let these serve as max values.
              }}>
           
           {/* Header with Gradient */}
