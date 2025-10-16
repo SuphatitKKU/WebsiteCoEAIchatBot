@@ -26,9 +26,8 @@ export const Navbar = () => {
         />
       </Link>
 
-      {/* Desktop Menu - จะซ่อนเมื่อเป็น Tablet แนวตั้ง หรือ Mobile */}
-      {/* ใช้ md:flex เพื่อให้แสดงบน Desktop/Tablet แนวนอน แต่ซ่อนใน Mobile/Tablet แนวตั้ง */}
-      <div className='hidden md:flex items-center gap-6 lg:gap-8 text-gray-700 text-base lg:text-lg'>
+      {/* Desktop Menu - ซ่อนตามค่าเริ่มต้นและแสดงเฉพาะบนหน้าจอขนาดใหญ่ (lg ขึ้นไป) */}
+      <div className='hidden lg:flex items-center gap-6 lg:gap-8 text-gray-700 text-base lg:text-lg'>
         <Link 
           to="/" 
           className={`hover:text-primary transition-colors ${
@@ -75,13 +74,13 @@ export const Navbar = () => {
         </Link>
       </div>
 
-      {/* Mobile Sidebar - จะแสดงเมื่อเป็น Tablet แนวตั้ง หรือ Mobile */}
-      {/* ใช้ md:hidden เพื่อซ่อนใน Desktop/Tablet แนวนอน แต่แสดงใน Mobile/Tablet แนวตั้ง */}
+      {/* Mobile Sidebar - แสดงตามค่าเริ่มต้นและซ่อนเฉพาะบนหน้าจอขนาดใหญ่ (lg ขึ้นไป) */}
       <div
-        className={`md:hidden fixed top-0 bottom-0 right-0 z-50
+        className={`fixed top-0 bottom-0 right-0 z-50
           ${sidebarOpen ? 'w-72' : 'w-0'}
           overflow-hidden transition-all duration-300 ease-in-out
-          bg-primary text-white min-h-screen flex flex-col pt-16`}
+          bg-primary text-white min-h-screen flex flex-col pt-16
+          lg:hidden`} {/* เพิ่ม lg:hidden เพื่อซ่อนใน desktop */}
       >
         <img
           src={assets.close_icon}
@@ -157,11 +156,10 @@ export const Navbar = () => {
 
       {/* Right Side - Desktop Button & Mobile Menu Icon */}
       <div className='flex items-center gap-3 relative z-10'>
-        {/* Mobile Menu Button - จะแสดงเมื่อเป็น Tablet แนวตั้ง หรือ Mobile */}
-        {/* ใช้ md:hidden เพื่อซ่อนใน Desktop/Tablet แนวนอน แต่แสดงใน Mobile/Tablet แนวตั้ง */}
+        {/* Mobile Menu Button - แสดงตามค่าเริ่มต้นและซ่อนเฉพาะบนหน้าจอขนาดใหญ่ (lg ขึ้นไป) */}
         <button
           onClick={() => setSidebarOpen(true)}
-          className='md:hidden p-2 hover:bg-black/10 rounded-lg transition-colors'
+          className='p-2 hover:bg-black/10 rounded-lg transition-colors lg:hidden' {/* เพิ่ม lg:hidden */}
           aria-label="Open menu"
         >
           <img
@@ -171,11 +169,10 @@ export const Navbar = () => {
           />
         </button>
 
-        {/* Desktop CTA Button - จะซ่อนเมื่อเป็น Tablet แนวตั้ง หรือ Mobile */}
-        {/* ใช้ md:flex เพื่อให้แสดงบน Desktop/Tablet แนวนอน แต่ซ่อนใน Mobile/Tablet แนวตั้ง */}
+        {/* Desktop CTA Button - ซ่อนตามค่าเริ่มต้นและแสดงเฉพาะบนหน้าจอขนาดใหญ่ (lg ขึ้นไป) */}
         <Link
           to="/feedback"
-          className='hidden md:flex items-center gap-2
+          className='hidden lg:flex items-center gap-2 {/* เปลี่ยน md:flex เป็น lg:flex */}
                      bg-primary text-white px-4 py-2 lg:px-6 lg:py-3 rounded-full
                      cursor-pointer hover:scale-105 hover:bg-primary/90 
                      transition-all font-medium text-sm lg:text-base

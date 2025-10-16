@@ -228,10 +228,10 @@ ${contextData}
       {/* Floating Chat Button */}
       <button
         onClick={toggleChat}
-        className={`fixed bottom-6 right-6 ${primaryColor} ${primaryHoverColor} text-white p-5 rounded-full shadow-2xl z-50 focus:outline-none focus:ring-4 ${focusRingColor} focus:ring-opacity-50 transition-all duration-300 hover:scale-110 active:scale-95 hover:shadow-[0_0_30px_rgba(154,21,24,0.5)]`}
+        className={`fixed bottom-6 right-6 ${primaryColor} ${primaryHoverColor} text-white p-3 rounded-full shadow-2xl z-50 focus:outline-none focus:ring-4 ${focusRingColor} focus:ring-opacity-50 transition-all duration-300 hover:scale-110 active:scale-95 hover:shadow-[0_0_30px_rgba(154,21,24,0.5)]`}
       >
         <svg xmlns="http://www.w3.org/2000/svg"
-          className={`h-7 w-7 transition-transform duration-300 ${isOpen ? 'rotate-90' : 'rotate-0'}`}
+          className={`h-5 w-5 transition-transform duration-300 ${isOpen ? 'rotate-90' : 'rotate-0'}`}
           fill="none" viewBox="0 0 24 24" stroke="currentColor">
           {isOpen ? (
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5}
@@ -245,9 +245,9 @@ ${contextData}
 
       {/* Chat Window */}
       {isVisible && (
-        <div className={`fixed bottom-24 right-6 z-50 flex flex-col
-                    w-[calc(100vw-3rem)] sm:w-96 md:w-[420px] lg:w-[460px]
-                    h-[calc(100vh-180px)] sm:h-[500px] md:h-[580px] lg:h-[650px]
+        <div className={`fixed bottom-16 right-6 z-50 flex flex-col
+                    w-[calc(100vw-3rem)] sm:w-80 md:w-[360px] lg:w-[400px]
+                    h-[calc(100vh-250px)] sm:h-[400px] md:h-[480px] lg:h-[550px]
                     rounded-2xl shadow-[0_20px_60px_rgba(0,0,0,0.3)]
                     transition-all duration-300 ease-out origin-bottom-right overflow-hidden
                     ${isOpen ? 'opacity-100 scale-100 translate-y-0' : 'opacity-0 scale-95 translate-y-4'}`}
@@ -259,65 +259,65 @@ ${contextData}
           }}>
 
           {/* Header with Gradient */}
-          <div className={`p-4 flex justify-between items-center ${primaryColor} relative overflow-hidden flex-none`}
+          <div className={`p-3 flex justify-between items-center ${primaryColor} relative overflow-hidden flex-none`}
             style={{
               background: 'linear-gradient(135deg, #9a1518 0%, #c41e22 100%)',
             }}>
-            <div className="flex items-center space-x-3 z-10">
-              <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <div className="flex items-center space-x-2 z-10">
+              <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
                 </svg>
               </div>
               <div>
-                <h3 className="text-lg font-bold text-white">CodMe AI Assistant</h3>
+                <h3 className="text-base font-bold text-white">CodMe AI Assistant</h3>
                 <p className="text-xs text-white/80">พร้อมให้คำปรึกษาตลอด 24 ชม.</p>
               </div>
             </div>
-            <button onClick={toggleChat} className="text-white/90 hover:text-white hover:bg-white/10 rounded-full p-2 transition-all duration-200 z-10">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <button onClick={toggleChat} className="text-white/90 hover:text-white hover:bg-white/10 rounded-full p-1 transition-all duration-200 z-10">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
 
             {/* Decorative Elements */}
-            <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-16 translate-x-16 blur-2xl"></div>
-            <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/10 rounded-full translate-y-12 -translate-x-12 blur-2xl"></div>
+            <div className="absolute top-0 right-0 w-24 h-24 bg-white/10 rounded-full -translate-y-12 translate-x-12 blur-2xl"></div>
+            <div className="absolute bottom-0 left-0 w-16 h-16 bg-white/10 rounded-full translate-y-8 -translate-x-8 blur-2xl"></div>
           </div>
 
           {/* Chat Content */}
-          <div ref={chatContentRef} className="flex-grow p-5 overflow-y-auto flex flex-col space-y-4 min-h-0">
+          <div ref={chatContentRef} className="flex-grow p-3 overflow-y-auto flex flex-col space-y-3 min-h-0 text-sm"> {/* Added text-sm here */}
             {showInitialWelcomeUI ? (
-              <div className="flex flex-col items-center justify-center h-full space-y-6 px-4">
+              <div className="flex flex-col items-center justify-center h-full space-y-4 px-3">
                 <div className="relative">
-                  <div className="w-24 h-24 bg-gradient-to-br from-[#9a1518] to-[#c41e22] rounded-3xl flex items-center justify-center shadow-xl rotate-6 hover:rotate-12 transition-transform duration-300">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <div className="w-20 h-20 bg-gradient-to-br from-[#9a1518] to-[#c41e22] rounded-2xl flex items-center justify-center shadow-xl rotate-6 hover:rotate-12 transition-transform duration-300">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
                     </svg>
                   </div>
-                  <div className="absolute -top-2 -right-2 w-6 h-6 bg-green-400 rounded-full border-4 border-white animate-pulse"></div>
+                  <div className="absolute -top-2 -right-2 w-5 h-5 bg-green-400 rounded-full border-3 border-white animate-pulse"></div>
                 </div>
 
-                <div className="text-center space-y-3">
-                  <h4 className="text-2xl font-bold text-gray-800">ยินดีต้อนรับ! 👋</h4>
-                  <p className="text-gray-600 text-base leading-relaxed max-w-xs">
+                <div className="text-center space-y-2">
+                  <h4 className="text-xl font-bold text-gray-800">ยินดีต้อนรับ! 👋</h4>
+                  <p className="text-gray-600 text-sm leading-relaxed max-w-xs">
                     ฉันคือผู้ช่วยอัจฉริยะของสาขาวิศวกรรมคอมพิวเตอร์ และ สื่อดิจิตอล<br />
                     <span className="text-[#9a1518] font-semibold">มหาวิทยาลัยขอนแก่น</span>
                   </p>
                 </div>
 
                 <div className="w-full max-w-xs space-y-2">
-                  <p className="text-sm text-gray-500 text-center font-medium">คำถามแนะนำ:</p>
-                  <div className="space-y-2">
+                  <p className="text-xs text-gray-500 text-center font-medium">คำถามแนะนำ:</p>
+                  <div className="space-y-1">
                     <button
                       onClick={() => setInputMessage('วิชาเลือกสำหรับคนที่ชอบเขียนเว็บมีอะไรบ้าง')}
-                      className="w-full p-3 bg-white/60 hover:bg-white/80 backdrop-blur-sm rounded-xl text-sm text-gray-700 text-left transition-all duration-200 border border-gray-200 hover:border-[#9a1518] hover:shadow-md"
+                      className="w-full p-2 bg-white/60 hover:bg-white/80 backdrop-blur-sm rounded-lg text-xs text-gray-700 text-left transition-all duration-200 border border-gray-200 hover:border-[#9a1518] hover:shadow-md"
                     >
                       💻 วิชาเลือกสำหรับคนที่ชอบเขียนเว็บ
                     </button>
                     <button
                       onClick={() => setInputMessage('หลักสูตรของคณะมีอะไรบ้าง')}
-                      className="w-full p-3 bg-white/60 hover:bg-white/80 backdrop-blur-sm rounded-xl text-sm text-gray-700 text-left transition-all duration-200 border border-gray-200 hover:border-[#9a1518] hover:shadow-md"
+                      className="w-full p-2 bg-white/60 hover:bg-white/80 backdrop-blur-sm rounded-lg text-xs text-gray-700 text-left transition-all duration-200 border border-gray-200 hover:border-[#9a1518] hover:shadow-md"
                     >
                       📚 หลักสูตรของคณะมีอะไรบ้าง
                     </button>
@@ -328,7 +328,7 @@ ${contextData}
               messages.map((msg, index) => (
                 <div key={index} className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'} animate-fadeIn`}>
                   <div
-                    className={`max-w-[80%] p-3 rounded-2xl shadow-lg transition-all duration-200 hover:shadow-xl ${
+                    className={`max-w-[80%] p-2 rounded-xl shadow-lg transition-all duration-200 hover:shadow-xl text-sm ${
                       msg.sender === 'user'
                         ? 'bg-gradient-to-br from-[#9a1518] to-[#c41e22] text-white rounded-br-sm'
                         : 'bg-white/80 backdrop-blur-sm text-gray-800 border border-white/50 rounded-bl-sm'
@@ -342,17 +342,17 @@ ${contextData}
             )}
             {isLoading && (
               <div className="flex justify-start animate-fadeIn">
-                <div className="bg-white/80 backdrop-blur-sm text-gray-800 p-4 rounded-2xl rounded-bl-sm shadow-lg border border-white/50 flex space-x-2">
-                  <div className="w-2.5 h-2.5 bg-[#9a1518] rounded-full animate-bounce"></div>
-                  <div className="w-2.5 h-2.5 bg-[#9a1518] rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
-                  <div className="w-2.5 h-2.5 bg-[#9a1518] rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                <div className="bg-white/80 backdrop-blur-sm text-gray-800 p-3 rounded-xl rounded-bl-sm shadow-lg border border-white/50 flex space-x-1.5">
+                  <div className="w-2 h-2 bg-[#9a1518] rounded-full animate-bounce"></div>
+                  <div className="w-2 h-2 bg-[#9a1518] rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
+                  <div className="w-2 h-2 bg-[#9a1518] rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
                 </div>
               </div>
             )}
           </div>
 
           {/* Input Area */}
-          <div className="p-4 border-t border-white/30"
+          <div className="p-3 border-t border-white/30 text-sm" // Added text-sm here
             style={{
               background: 'rgba(255, 255, 255, 0.3)',
               backdropFilter: 'blur(10px)',
@@ -362,7 +362,7 @@ ${contextData}
               <input
                 type="text"
                 placeholder="พิมพ์ข้อความของคุณที่นี่..."
-                className="flex-grow px-4 py-3 rounded-xl bg-white/70 backdrop-blur-sm border border-gray-200 
+                className="flex-grow px-3 py-2 rounded-lg bg-white/70 backdrop-blur-sm border border-gray-200 
                      focus:outline-none focus:ring-2 focus:ring-[#9a1518] focus:border-transparent
                      placeholder-gray-400 text-gray-800 transition-all duration-200"
                 value={inputMessage}
@@ -372,15 +372,15 @@ ${contextData}
               />
               <button
                 onClick={handleSendMessage}
-                className={`${primaryColor} ${primaryHoverColor} text-white p-3 rounded-xl shadow-lg
+                className={`${primaryColor} ${primaryHoverColor} text-white p-2 rounded-lg shadow-lg
                       transition-all duration-200 hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed
-                      hover:scale-105 active:scale-95 min-w-[52px] flex items-center justify-center`}
+                      hover:scale-105 active:scale-95 min-w-[40px] flex items-center justify-center`}
                 disabled={isLoading || !inputMessage.trim()}
               >
                 {isLoading ? (
-                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                 ) : (
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
                   </svg>
                 )}
