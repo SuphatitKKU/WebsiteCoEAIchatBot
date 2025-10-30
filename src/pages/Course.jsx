@@ -23,6 +23,21 @@ const COURSES = [
 const Course = () => {
   const [selectedCourse, setSelectedCourse] = useState(COURSES[0]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isMobile, setIsMobile] = useState(false); // สถานะเพื่อตรวจสอบว่าเป็นมือถือหรือไม่
+
+  useEffect(() => {
+    // ตรวจสอบขนาดหน้าจอเมื่อ component mount และเมื่อขนาดหน้าจอเปลี่ยน
+    const checkIsMobile = () => {
+      setIsMobile(window.innerWidth < 768); // กำหนด breakpoint ที่ 768px สำหรับมือถือ
+    };
+
+    checkIsMobile(); // ตรวจสอบครั้งแรก
+    window.addEventListener('resize', checkIsMobile); // เพิ่ม event listener เมื่อ resize
+
+    return () => {
+      window.removeEventListener('resize', checkIsMobile); // ลบ event listener เมื่อ unmount
+    };
+  }, []);
 
   useEffect(() => {
     setIsLoading(true);
@@ -282,73 +297,39 @@ const Course = () => {
             </div>
           </div>
 
-          {/* PDF Viewer Container */}
-          <div style={{ position: 'relative', minHeight: '800px' }}>
-            {isLoading && (
+          {/* PDF Viewer Container - Conditional rendering for mobile */}
+          <div style={{ position: 'relative', minHeight: isMobile ? 'auto' : '800px' }}>
+            {isMobile ? (
+              // แสดงเฉพาะปุ่มบนมือถือ
               <div style={{
-                position: 'absolute',
-                top: '50%',
-                left: '50%',
-                transform: 'translate(-50%, -50%)',
-                zIndex: 10,
-                textAlign: 'center'
+                padding: '3rem',
+                textAlign: 'center',
+                background: '#f8f9fa',
+                borderRadius: '12px',
+                border: '2px solid rgba(0,0,0,0.1)'
               }}>
-                <div style={{
-                  width: '60px',
-                  height: '60px',
-                  border: '4px solid rgba(220, 38, 38, 0.2)',
-                  borderTop: '4px solid #dc2626',
-                  borderRadius: '50%',
-                  animation: 'spin 1s linear infinite',
-                  margin: '0 auto 1rem'
-                }}></div>
-                <p style={{ color: '#666', fontWeight: '500' }}>กำลังโหลดเอกสาร...</p>
-              </div>
-            )}
-
-            <div style={{
-              borderRadius: '12px',
-              overflow: 'hidden',
-              border: '2px solid rgba(0,0,0,0.1)',
-              background: '#f8f9fa',
-              visibility: isLoading ? 'hidden' : 'visible', 
-              height: isLoading ? '0' : '800px', 
-              transition: 'visibility 0s, height 0s, opacity 0.3s ease-in-out',
-              opacity: isLoading ? 0 : 1
-            }}>
-              <iframe
-                key={selectedCourse.id} 
-                src={getPdfViewerUrl(selectedCourse.file)}
-                title={`Course Document for ${selectedCourse.title}`}
-                width="100%"
-                height="100%" 
-                style={{
-                  border: 'none',
-                  display: 'block'
-                }}
-                onLoad={handleIframeLoad}
-                onError={handleIframeError}
-                allow="fullscreen"
-              >
-                {/* Fallback content for browsers that don't support iframes or PDF viewing */}
-                <div style={{
-                  padding: '3rem',
-                  textAlign: 'center',
-                  background: '#f8f9fa'
+                <p style={{ 
+                  color: '#666', 
+                  marginBottom: '1.5rem',
+                  fontSize: '1.1rem'
                 }}>
-                  <p style={{ 
-                    color: '#666', 
-                    marginBottom: '1rem',
-                    fontSize: '1.1rem'
-                  }}>
-                    เบราว์เซอร์ของคุณไม่รองรับการแสดง PDF โดยตรง หรือเกิดข้อผิดพลาดในการโหลด
-                  </p>
+                  บนอุปกรณ์มือถือ ขอแนะนำให้เปิดเอกสารในแอปพลิเคชันภายนอกเพื่อประสบการณ์ที่ดีที่สุด
+                </p>
+                <div style={{ 
+                  display: 'flex', 
+                  flexDirection: 'column', // Stack buttons on mobile
+                  gap: '1rem', 
+                  maxWidth: '300px', // Limit width for buttons
+                  margin: '0 auto' 
+                }}>
                   <a
                     href={selectedCourse.file}
-                    download
+                    target="_blank"
+                    rel="noopener noreferrer"
                     style={{
                       display: 'inline-flex',
                       alignItems: 'center',
+                      justifyContent: 'center',
                       gap: '0.5rem',
                       padding: '0.875rem 2rem',
                       background: 'linear-gradient(135deg, #dc2626 0%, #7d1315 100%)',
@@ -357,83 +338,193 @@ const Course = () => {
                       fontWeight: '600',
                       textDecoration: 'none',
                       boxShadow: '0 4px 12px rgba(220, 38, 38, 0.4)',
+                      transition: 'all 0.3s ease'
+                    }}
+                  >
+                    <span>🔗</span>
+                    <span>เปิดเอกสาร</span>
+                  </a>
+                  <a
+                    href={selectedCourse.file}
+                    download
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '0.5rem',
+                      padding: '0.875rem 2rem',
+                      background: 'rgba(255, 255, 255, 0.9)',
+                      color: '#333',
+                      border: '2px solid rgba(0,0,0,0.1)',
+                      borderRadius: '12px',
+                      fontWeight: '600',
+                      textDecoration: 'none',
+                      boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+                      transition: 'all 0.3s ease'
                     }}
                   >
                     <span>⬇</span>
-                    <span>ดาวน์โหลดเอกสาร PDF</span>
+                    <span>ดาวน์โหลดเอกสาร</span>
                   </a>
                 </div>
-              </iframe>
-            </div>
+              </div>
+            ) : (
+              // แสดง iframe บน desktop/tablet
+              <>
+                {isLoading && (
+                  <div style={{
+                    position: 'absolute',
+                    top: '50%',
+                    left: '50%',
+                    transform: 'translate(-50%, -50%)',
+                    zIndex: 10,
+                    textAlign: 'center'
+                  }}>
+                    <div style={{
+                      width: '60px',
+                      height: '60px',
+                      border: '4px solid rgba(220, 38, 38, 0.2)',
+                      borderTop: '4px solid #dc2626',
+                      borderRadius: '50%',
+                      animation: 'spin 1s linear infinite',
+                      margin: '0 auto 1rem'
+                    }}></div>
+                    <p style={{ color: '#666', fontWeight: '500' }}>กำลังโหลดเอกสาร...</p>
+                  </div>
+                )}
+
+                <div style={{
+                  borderRadius: '12px',
+                  overflow: 'hidden',
+                  border: '2px solid rgba(0,0,0,0.1)',
+                  background: '#f8f9fa',
+                  visibility: isLoading ? 'hidden' : 'visible', 
+                  height: isLoading ? '0' : '800px', 
+                  transition: 'visibility 0s, height 0s, opacity 0.3s ease-in-out',
+                  opacity: isLoading ? 0 : 1
+                }}>
+                  <iframe
+                    key={selectedCourse.id} 
+                    src={getPdfViewerUrl(selectedCourse.file)}
+                    title={`Course Document for ${selectedCourse.title}`}
+                    width="100%"
+                    height="100%" 
+                    style={{
+                      border: 'none',
+                      display: 'block'
+                    }}
+                    onLoad={handleIframeLoad}
+                    onError={handleIframeError}
+                    allow="fullscreen"
+                  >
+                    {/* Fallback content for browsers that don't support iframes or PDF viewing */}
+                    <div style={{
+                      padding: '3rem',
+                      textAlign: 'center',
+                      background: '#f8f9fa'
+                    }}>
+                      <p style={{ 
+                        color: '#666', 
+                        marginBottom: '1rem',
+                        fontSize: '1.1rem'
+                      }}>
+                        เบราว์เซอร์ของคุณไม่รองรับการแสดง PDF โดยตรง หรือเกิดข้อผิดพลาดในการโหลด
+                      </p>
+                      <a
+                        href={selectedCourse.file}
+                        download
+                        style={{
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '0.5rem',
+                          padding: '0.875rem 2rem',
+                          background: 'linear-gradient(135deg, #dc2626 0%, #7d1315 100%)',
+                          color: 'white',
+                          borderRadius: '12px',
+                          fontWeight: '600',
+                          textDecoration: 'none',
+                          boxShadow: '0 4px 12px rgba(220, 38, 38, 0.4)',
+                        }}
+                      >
+                        <span>⬇</span>
+                        <span>ดาวน์โหลดเอกสาร PDF</span>
+                      </a>
+                    </div>
+                  </iframe>
+                </div>
+              </>
+            )}
           </div>
 
-          {/* Action Buttons */}
-          <div style={{ 
-            display: 'flex', 
-            gap: '1rem', 
-            marginTop: '1.5rem',
-            justifyContent: 'center',
-            flexWrap: 'wrap'
-          }}>
-            <a
-              href={selectedCourse.file}
-              target="_blank"
-              rel="noopener noreferrer"
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '0.5rem',
-                padding: '0.875rem 2rem',
-                background: 'linear-gradient(135deg, #dc2626 0%, #7d1315 100%)',
-                color: 'white',
-                borderRadius: '12px',
-                fontWeight: '600',
-                textDecoration: 'none',
-                boxShadow: '0 4px 12px rgba(220, 38, 38, 0.4)',
-                transition: 'all 0.3s ease'
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.transform = 'translateY(-2px)';
-                e.currentTarget.style.boxShadow = '0 6px 16px rgba(220, 38, 38, 0.5)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.transform = 'translateY(0)';
-                e.currentTarget.style.boxShadow = '0 4px 12px rgba(220, 38, 38, 0.4)';
-              }}
-            >
-              <span>🔗</span>
-              <span>เปิดในหน้าต่างใหม่</span>
-            </a>
-            <a
-              href={selectedCourse.file}
-              download
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '0.5rem',
-                padding: '0.875rem 2rem',
-                background: 'rgba(255, 255, 255, 0.9)',
-                color: '#333',
-                border: '2px solid rgba(0,0,0,0.1)',
-                borderRadius: '12px',
-                fontWeight: '600',
-                textDecoration: 'none',
-                boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
-                transition: 'all 0.3s ease'
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.transform = 'translateY(-2px)';
-                e.currentTarget.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.15)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.transform = 'translateY(0)';
-                e.currentTarget.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.1)';
-              }}
-            >
-              <span>⬇</span>
-              <span>ดาวน์โหลดเอกสาร</span>
-            </a>
-          </div>
+          {/* Action Buttons - Removed for redundancy on mobile */}
+          {!isMobile && (
+            <div style={{ 
+              display: 'flex', 
+              gap: '1rem', 
+              marginTop: '1.5rem',
+              justifyContent: 'center',
+              flexWrap: 'wrap'
+            }}>
+              <a
+                href={selectedCourse.file}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '0.5rem',
+                  padding: '0.875rem 2rem',
+                  background: 'linear-gradient(135deg, #dc2626 0%, #7d1315 100%)',
+                  color: 'white',
+                  borderRadius: '12px',
+                  fontWeight: '600',
+                  textDecoration: 'none',
+                  boxShadow: '0 4px 12px rgba(220, 38, 38, 0.4)',
+                  transition: 'all 0.3s ease'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = 'translateY(-2px)';
+                  e.currentTarget.style.boxShadow = '0 6px 16px rgba(220, 38, 38, 0.5)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = 'translateY(0)';
+                  e.currentTarget.style.boxShadow = '0 4px 12px rgba(220, 38, 38, 0.4)';
+                }}
+              >
+                <span>🔗</span>
+                <span>เปิดในหน้าต่างใหม่</span>
+              </a>
+              <a
+                href={selectedCourse.file}
+                download
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '0.5rem',
+                  padding: '0.875rem 2rem',
+                  background: 'rgba(255, 255, 255, 0.9)',
+                  color: '#333',
+                  border: '2px solid rgba(0,0,0,0.1)',
+                  borderRadius: '12px',
+                  fontWeight: '600',
+                  textDecoration: 'none',
+                  boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+                  transition: 'all 0.3s ease'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = 'translateY(-2px)';
+                  e.currentTarget.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.15)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = 'translateY(0)';
+                  e.currentTarget.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.1)';
+                }}
+              >
+                <span>⬇</span>
+                <span>ดาวน์โหลดเอกสาร</span>
+              </a>
+            </div>
+          )}
         </section>
 
         {/* Info Note */}
