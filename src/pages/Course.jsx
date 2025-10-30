@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import assets from '../assets/assets';
 
 const COURSES = [
   {
@@ -23,19 +22,18 @@ const COURSES = [
 const Course = () => {
   const [selectedCourse, setSelectedCourse] = useState(COURSES[0]);
   const [isLoading, setIsLoading] = useState(true);
-  const [isMobile, setIsMobile] = useState(false); // สถานะเพื่อตรวจสอบว่าเป็นมือถือหรือไม่
+  const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
-    // ตรวจสอบขนาดหน้าจอเมื่อ component mount และเมื่อขนาดหน้าจอเปลี่ยน
     const checkIsMobile = () => {
-      setIsMobile(window.innerWidth < 768); // กำหนด breakpoint ที่ 768px สำหรับมือถือ
+      setIsMobile(window.innerWidth < 768);
     };
 
-    checkIsMobile(); // ตรวจสอบครั้งแรก
-    window.addEventListener('resize', checkIsMobile); // เพิ่ม event listener เมื่อ resize
+    checkIsMobile();
+    window.addEventListener('resize', checkIsMobile);
 
     return () => {
-      window.removeEventListener('resize', checkIsMobile); // ลบ event listener เมื่อ unmount
+      window.removeEventListener('resize', checkIsMobile);
     };
   }, []);
 
@@ -59,50 +57,58 @@ const Course = () => {
   };
 
   const getPdfViewerUrl = (pdfPath) => {
-    // ใช้ path โดยตรง แต่เพิ่ม parameter เพื่อบังคับให้แสดงแทนดาวน์โหลด
     return `${pdfPath}#view=FitH`;
   };
 
   return (
-    <main style={{ position: 'relative', minHeight: '100vh', paddingBottom: '170px'}}>
-      {/* Background images */}
-      <img 
-        src={assets.bgImage1}
-        alt="" 
+    <main style={{ 
+      position: 'relative', 
+      minHeight: '100vh', 
+      paddingBottom: '170px',
+      overflow: 'hidden' // ป้องกันรูปพื้นหลังล้น
+    }}>
+      {/* Background images - ปรับให้ responsive */}
+      <div 
         style={{ 
           position: 'absolute',
           pointerEvents: 'none',
           opacity: 0.7,
-          width: '700px',
-          height: '700px',
-          top: '-180px', 
-          right: '10px',
+          width: 'min(700px, 80vw)',
+          height: 'min(700px, 80vw)',
+          top: 'clamp(-180px, -10vh, 0px)', 
+          right: 'clamp(-100px, 1vw, 10px)',
+          background: 'radial-gradient(circle, rgba(220, 38, 38, 0.15) 0%, transparent 70%)',
           zIndex: 0
         }}
       />
 
-      <img 
-        src={assets.bgImage1}
-        alt="" 
+      <div 
         style={{ 
           position: 'absolute',
           pointerEvents: 'none',
           opacity: 0.7,
-          width: '700px',
-          height: '700px',
-          top: '700px', 
-          left: '10px',
+          width: 'min(700px, 80vw)',
+          height: 'min(700px, 80vw)',
+          top: 'clamp(500px, 80vh, 700px)', 
+          left: 'clamp(-100px, 1vw, 10px)',
+          background: 'radial-gradient(circle, rgba(220, 38, 38, 0.15) 0%, transparent 70%)',
           zIndex: 0
         }}
       />
       
       {/* Content wrapper */}
-      <div style={{ position: 'relative', zIndex: 10, maxWidth: '1200px', margin: '0 auto', padding: '2rem' }}>
+      <div style={{ 
+        position: 'relative', 
+        zIndex: 10, 
+        maxWidth: '1200px', 
+        margin: '0 auto', 
+        padding: 'clamp(1rem, 3vw, 2rem)'
+      }}>
         
         {/* Title Section */}
-        <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
+        <div style={{ textAlign: 'center', marginBottom: 'clamp(2rem, 5vw, 3rem)' }}>
           <h1 style={{ 
-            fontSize: '2.5rem', 
+            fontSize: 'clamp(1.75rem, 4vw, 2.5rem)',
             fontWeight: 'bold', 
             marginBottom: '0.5rem',
             color: '#1a1a1a'
@@ -110,13 +116,17 @@ const Course = () => {
             ข้อมูลหลักสูตร
           </h1>
           <div style={{
-            width: '80px',
+            width: 'clamp(60px, 10vw, 80px)',
             height: '4px',
             background: 'linear-gradient(to right, #dc2626, #7d1315)',
             margin: '1rem auto',
             borderRadius: '2px'
           }}></div>
-          <p style={{ color: '#666', fontSize: '1.1rem' }}>
+          <p style={{ 
+            color: '#666', 
+            fontSize: 'clamp(0.95rem, 2vw, 1.1rem)',
+            padding: '0 1rem'
+          }}>
             รายละเอียดหลักสูตรและเอกสาร มคอ.2
           </p>
         </div>
@@ -124,26 +134,28 @@ const Course = () => {
         {/* Course Selection Pills */}
         <div style={{ 
           display: 'flex', 
-          gap: '1rem', 
-          marginBottom: '2rem',
+          gap: 'clamp(0.75rem, 2vw, 1rem)',
+          marginBottom: 'clamp(1.5rem, 3vw, 2rem)',
           justifyContent: 'center',
-          flexWrap: 'wrap'
+          flexWrap: 'wrap',
+          padding: '0 1rem'
         }}>
           {COURSES.map((course) => (
             <button
               key={course.id}
               onClick={() => handleCourseChange(course)}
               style={{
-                padding: '0.75rem 2rem',
+                padding: 'clamp(0.625rem, 2vw, 0.75rem) clamp(1.25rem, 3vw, 2rem)',
                 borderRadius: '50px',
                 border: selectedCourse.id === course.id ? '3px solid #dc2626' : '2px solid rgba(0,0,0,0.1)',
                 background: selectedCourse.id === course.id ? '#dc2626' : 'rgba(255,255,255,0.9)',
                 color: selectedCourse.id === course.id ? 'white' : '#333',
                 fontWeight: '600',
-                fontSize: '1rem',
+                fontSize: 'clamp(0.875rem, 2vw, 1rem)',
                 cursor: 'pointer',
                 transition: 'all 0.3s ease',
                 boxShadow: selectedCourse.id === course.id ? '0 4px 12px rgba(220, 38, 38, 0.3)' : '0 2px 8px rgba(0,0,0,0.1)',
+                whiteSpace: 'nowrap'
               }}
               onMouseEnter={(e) => {
                 if (selectedCourse.id !== course.id) {
@@ -167,8 +179,8 @@ const Course = () => {
         <section style={{
           background: 'rgba(255, 255, 255, 0.85)',
           backdropFilter: 'blur(20px)',
-          borderRadius: '24px',
-          padding: '2rem',
+          borderRadius: 'clamp(16px, 3vw, 24px)',
+          padding: 'clamp(1.5rem, 3vw, 2rem)',
           boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
           border: '1px solid rgba(255, 255, 255, 0.18)',
           marginBottom: '2rem'
@@ -177,27 +189,29 @@ const Course = () => {
           {/* Card Header with Logo */}
           <header style={{ 
             display: 'flex', 
-            alignItems: 'center', 
+            flexDirection: isMobile ? 'column' : 'row',
+            alignItems: isMobile ? 'center' : 'flex-start',
+            textAlign: isMobile ? 'center' : 'left',
             gap: '1.5rem',
-            marginBottom: '2rem',
-            paddingBottom: '1.5rem',
+            marginBottom: 'clamp(1.5rem, 3vw, 2rem)',
+            paddingBottom: 'clamp(1rem, 2.5vw, 1.5rem)',
             borderBottom: '2px solid rgba(0,0,0,0.1)'
           }}>
             <div style={{
-              width: '80px',
-              height: '80px',
+              width: 'clamp(60px, 10vw, 80px)',
+              height: 'clamp(60px, 10vw, 80px)',
               background: 'linear-gradient(135deg, #dc2626 0%, #7d1315 100%)',
-              borderRadius: '16px',
+              borderRadius: 'clamp(12px, 2vw, 16px)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               flexShrink: 0
             }}>
-              <span style={{ fontSize: '2.5rem' }}>📚</span>
+              <span style={{ fontSize: 'clamp(2rem, 4vw, 2.5rem)' }}>📚</span>
             </div>
             <div style={{ flex: 1 }}>
               <h2 style={{ 
-                fontSize: '1.75rem', 
+                fontSize: 'clamp(1.25rem, 3vw, 1.75rem)',
                 fontWeight: 'bold',
                 marginBottom: '0.25rem',
                 color: '#1a1a1a'
@@ -205,13 +219,17 @@ const Course = () => {
                 {selectedCourse.title}
               </h2>
               <div style={{
-                width: '60px',
+                width: 'clamp(50px, 8vw, 60px)',
                 height: '3px',
                 background: 'linear-gradient(to right, #dc2626, #7d1315)',
                 marginBottom: '0.5rem',
+                margin: isMobile ? '0.5rem auto' : '0.5rem 0',
                 borderRadius: '2px'
               }}></div>
-              <p style={{ color: '#666', fontSize: '1rem' }}>
+              <p style={{ 
+                color: '#666', 
+                fontSize: 'clamp(0.875rem, 2vw, 1rem)'
+              }}>
                 {selectedCourse.engTitle}
               </p>
             </div>
@@ -220,23 +238,27 @@ const Course = () => {
           {/* Document Info Section */}
           <div style={{
             background: 'rgba(220, 38, 38, 0.05)',
-            padding: '1.5rem',
-            borderRadius: '16px',
-            marginBottom: '1.5rem',
+            padding: 'clamp(1rem, 2.5vw, 1.5rem)',
+            borderRadius: 'clamp(12px, 2vw, 16px)',
+            marginBottom: 'clamp(1rem, 2.5vw, 1.5rem)',
             border: '1px solid rgba(220, 38, 38, 0.1)'
           }}>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1.5rem' }}>
+            <div style={{ 
+              display: 'grid', 
+              gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', 
+              gap: 'clamp(1rem, 2.5vw, 1.5rem)'
+            }}>
               <div>
                 <div style={{ 
                   color: '#666', 
-                  fontSize: '0.875rem', 
+                  fontSize: 'clamp(0.75rem, 1.8vw, 0.875rem)',
                   marginBottom: '0.25rem',
                   fontWeight: '500'
                 }}>
                   รหัสหลักสูตร
                 </div>
                 <div style={{ 
-                  fontSize: '1.125rem', 
+                  fontSize: 'clamp(1rem, 2.2vw, 1.125rem)',
                   fontWeight: 'bold',
                   color: '#1a1a1a'
                 }}>
@@ -246,14 +268,14 @@ const Course = () => {
               <div>
                 <div style={{ 
                   color: '#666', 
-                  fontSize: '0.875rem', 
+                  fontSize: 'clamp(0.75rem, 1.8vw, 0.875rem)',
                   marginBottom: '0.25rem',
                   fontWeight: '500'
                 }}>
                   ปีหลักสูตร
                 </div>
                 <div style={{ 
-                  fontSize: '1.125rem', 
+                  fontSize: 'clamp(1rem, 2.2vw, 1.125rem)',
                   fontWeight: 'bold',
                   color: '#1a1a1a'
                 }}>
@@ -263,14 +285,14 @@ const Course = () => {
               <div>
                 <div style={{ 
                   color: '#666', 
-                  fontSize: '0.875rem', 
+                  fontSize: 'clamp(0.75rem, 1.8vw, 0.875rem)',
                   marginBottom: '0.25rem',
                   fontWeight: '500'
                 }}>
                   ประเภทเอกสาร
                 </div>
                 <div style={{ 
-                  fontSize: '1.125rem', 
+                  fontSize: 'clamp(1rem, 2.2vw, 1.125rem)',
                   fontWeight: 'bold',
                   color: '#1a1a1a'
                 }}>
@@ -280,14 +302,14 @@ const Course = () => {
               <div>
                 <div style={{ 
                   color: '#666', 
-                  fontSize: '0.875rem', 
+                  fontSize: 'clamp(0.75rem, 1.8vw, 0.875rem)',
                   marginBottom: '0.25rem',
                   fontWeight: '500'
                 }}>
                   คณะ
                 </div>
                 <div style={{ 
-                  fontSize: '1.125rem', 
+                  fontSize: 'clamp(1rem, 2.2vw, 1.125rem)',
                   fontWeight: 'bold',
                   color: '#1a1a1a'
                 }}>
@@ -297,12 +319,11 @@ const Course = () => {
             </div>
           </div>
 
-          {/* PDF Viewer Container - Conditional rendering for mobile */}
-          <div style={{ position: 'relative', minHeight: isMobile ? 'auto' : '800px' }}>
+          {/* PDF Viewer Container */}
+          <div style={{ position: 'relative', minHeight: isMobile ? 'auto' : 'clamp(600px, 80vh, 800px)' }}>
             {isMobile ? (
-              // แสดงเฉพาะปุ่มบนมือถือ
               <div style={{
-                padding: '3rem',
+                padding: 'clamp(2rem, 5vw, 3rem)',
                 textAlign: 'center',
                 background: '#f8f9fa',
                 borderRadius: '12px',
@@ -311,15 +332,16 @@ const Course = () => {
                 <p style={{ 
                   color: '#666', 
                   marginBottom: '1.5rem',
-                  fontSize: '1.1rem'
+                  fontSize: 'clamp(0.95rem, 2vw, 1.1rem)',
+                  lineHeight: '1.6'
                 }}>
                   บนอุปกรณ์มือถือ ขอแนะนำให้เปิดเอกสารในแอปพลิเคชันภายนอกเพื่อประสบการณ์ที่ดีที่สุด
                 </p>
                 <div style={{ 
                   display: 'flex', 
-                  flexDirection: 'column', // Stack buttons on mobile
+                  flexDirection: 'column',
                   gap: '1rem', 
-                  maxWidth: '300px', // Limit width for buttons
+                  maxWidth: '300px',
                   margin: '0 auto' 
                 }}>
                   <a
@@ -331,11 +353,12 @@ const Course = () => {
                       alignItems: 'center',
                       justifyContent: 'center',
                       gap: '0.5rem',
-                      padding: '0.875rem 2rem',
+                      padding: 'clamp(0.75rem, 2vw, 0.875rem) clamp(1.5rem, 3vw, 2rem)',
                       background: 'linear-gradient(135deg, #dc2626 0%, #7d1315 100%)',
                       color: 'white',
                       borderRadius: '12px',
                       fontWeight: '600',
+                      fontSize: 'clamp(0.875rem, 2vw, 1rem)',
                       textDecoration: 'none',
                       boxShadow: '0 4px 12px rgba(220, 38, 38, 0.4)',
                       transition: 'all 0.3s ease'
@@ -352,12 +375,13 @@ const Course = () => {
                       alignItems: 'center',
                       justifyContent: 'center',
                       gap: '0.5rem',
-                      padding: '0.875rem 2rem',
+                      padding: 'clamp(0.75rem, 2vw, 0.875rem) clamp(1.5rem, 3vw, 2rem)',
                       background: 'rgba(255, 255, 255, 0.9)',
                       color: '#333',
                       border: '2px solid rgba(0,0,0,0.1)',
                       borderRadius: '12px',
                       fontWeight: '600',
+                      fontSize: 'clamp(0.875rem, 2vw, 1rem)',
                       textDecoration: 'none',
                       boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
                       transition: 'all 0.3s ease'
@@ -369,7 +393,6 @@ const Course = () => {
                 </div>
               </div>
             ) : (
-              // แสดง iframe บน desktop/tablet
               <>
                 {isLoading && (
                   <div style={{
@@ -381,15 +404,19 @@ const Course = () => {
                     textAlign: 'center'
                   }}>
                     <div style={{
-                      width: '60px',
-                      height: '60px',
+                      width: 'clamp(50px, 8vw, 60px)',
+                      height: 'clamp(50px, 8vw, 60px)',
                       border: '4px solid rgba(220, 38, 38, 0.2)',
                       borderTop: '4px solid #dc2626',
                       borderRadius: '50%',
                       animation: 'spin 1s linear infinite',
                       margin: '0 auto 1rem'
                     }}></div>
-                    <p style={{ color: '#666', fontWeight: '500' }}>กำลังโหลดเอกสาร...</p>
+                    <p style={{ 
+                      color: '#666', 
+                      fontWeight: '500',
+                      fontSize: 'clamp(0.875rem, 2vw, 1rem)'
+                    }}>กำลังโหลดเอกสาร...</p>
                   </div>
                 )}
 
@@ -399,7 +426,7 @@ const Course = () => {
                   border: '2px solid rgba(0,0,0,0.1)',
                   background: '#f8f9fa',
                   visibility: isLoading ? 'hidden' : 'visible', 
-                  height: isLoading ? '0' : '800px', 
+                  height: isLoading ? '0' : 'clamp(600px, 80vh, 800px)',
                   transition: 'visibility 0s, height 0s, opacity 0.3s ease-in-out',
                   opacity: isLoading ? 0 : 1
                 }}>
@@ -417,16 +444,15 @@ const Course = () => {
                     onError={handleIframeError}
                     allow="fullscreen"
                   >
-                    {/* Fallback content for browsers that don't support iframes or PDF viewing */}
                     <div style={{
-                      padding: '3rem',
+                      padding: 'clamp(2rem, 5vw, 3rem)',
                       textAlign: 'center',
                       background: '#f8f9fa'
                     }}>
                       <p style={{ 
                         color: '#666', 
                         marginBottom: '1rem',
-                        fontSize: '1.1rem'
+                        fontSize: 'clamp(0.95rem, 2vw, 1.1rem)'
                       }}>
                         เบราว์เซอร์ของคุณไม่รองรับการแสดง PDF โดยตรง หรือเกิดข้อผิดพลาดในการโหลด
                       </p>
@@ -437,11 +463,12 @@ const Course = () => {
                           display: 'inline-flex',
                           alignItems: 'center',
                           gap: '0.5rem',
-                          padding: '0.875rem 2rem',
+                          padding: 'clamp(0.75rem, 2vw, 0.875rem) clamp(1.5rem, 3vw, 2rem)',
                           background: 'linear-gradient(135deg, #dc2626 0%, #7d1315 100%)',
                           color: 'white',
                           borderRadius: '12px',
                           fontWeight: '600',
+                          fontSize: 'clamp(0.875rem, 2vw, 1rem)',
                           textDecoration: 'none',
                           boxShadow: '0 4px 12px rgba(220, 38, 38, 0.4)',
                         }}
@@ -456,12 +483,12 @@ const Course = () => {
             )}
           </div>
 
-          {/* Action Buttons - Removed for redundancy on mobile */}
+          {/* Action Buttons */}
           {!isMobile && (
             <div style={{ 
               display: 'flex', 
-              gap: '1rem', 
-              marginTop: '1.5rem',
+              gap: 'clamp(0.75rem, 2vw, 1rem)',
+              marginTop: 'clamp(1rem, 2.5vw, 1.5rem)',
               justifyContent: 'center',
               flexWrap: 'wrap'
             }}>
@@ -473,11 +500,12 @@ const Course = () => {
                   display: 'inline-flex',
                   alignItems: 'center',
                   gap: '0.5rem',
-                  padding: '0.875rem 2rem',
+                  padding: 'clamp(0.75rem, 2vw, 0.875rem) clamp(1.5rem, 3vw, 2rem)',
                   background: 'linear-gradient(135deg, #dc2626 0%, #7d1315 100%)',
                   color: 'white',
                   borderRadius: '12px',
                   fontWeight: '600',
+                  fontSize: 'clamp(0.875rem, 2vw, 1rem)',
                   textDecoration: 'none',
                   boxShadow: '0 4px 12px rgba(220, 38, 38, 0.4)',
                   transition: 'all 0.3s ease'
@@ -501,12 +529,13 @@ const Course = () => {
                   display: 'inline-flex',
                   alignItems: 'center',
                   gap: '0.5rem',
-                  padding: '0.875rem 2rem',
+                  padding: 'clamp(0.75rem, 2vw, 0.875rem) clamp(1.5rem, 3vw, 2rem)',
                   background: 'rgba(255, 255, 255, 0.9)',
                   color: '#333',
                   border: '2px solid rgba(0,0,0,0.1)',
                   borderRadius: '12px',
                   fontWeight: '600',
+                  fontSize: 'clamp(0.875rem, 2vw, 1rem)',
                   textDecoration: 'none',
                   boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
                   transition: 'all 0.3s ease'
@@ -531,13 +560,18 @@ const Course = () => {
         <div style={{
           background: 'rgba(255, 255, 255, 0.85)',
           backdropFilter: 'blur(20px)',
-          borderRadius: '16px',
-          padding: '1.5rem',
+          borderRadius: 'clamp(12px, 2vw, 16px)',
+          padding: 'clamp(1rem, 2.5vw, 1.5rem)',
           boxShadow: '0 4px 16px rgba(0, 0, 0, 0.08)',
           border: '1px solid rgba(255, 255, 255, 0.18)',
           textAlign: 'center'
         }}>
-          <p style={{ color: '#666', margin: 0, lineHeight: '1.6' }}>
+          <p style={{ 
+            color: '#666', 
+            margin: 0, 
+            lineHeight: '1.6',
+            fontSize: 'clamp(0.875rem, 2vw, 1rem)'
+          }}>
             <strong style={{ color: '#1a1a1a' }}>หมายเหตุ:</strong> เอกสาร มคอ.2 เป็นรายละเอียดหลักสูตรตามมาตรฐานคุณวุฒิระดับอุดมศึกษา 
             ประกอบด้วยข้อมูลโครงสร้างหลักสูตร แผนการศึกษา และรายละเอียดรายวิชา
           </p>

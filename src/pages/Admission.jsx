@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import "./admission.css";
 import assets from "../assets/assets";
-import Title from "../components/Title";
 
 const COURSES = [
   {
@@ -295,7 +294,7 @@ function CourseCard({ course, index }) {
 
 export default function Admission() {
   return (
-    <main className="card-wrap" style={{ position: 'relative' }}>
+    <main className="card-wrap" style={{ position: 'relative', paddingBottom: '170px' }}>
       {/* Background image positioned absolutely */}
       <img 
         src={assets.bgImage1} 
@@ -325,10 +324,29 @@ export default function Admission() {
       
       {/* Content wrapper with higher z-index */}
       <div style={{ position: 'relative', zIndex: 10 }}>
-        <Title
-          title="เกณฑ์การรับเข้า"
-          desc="คุณสมบัติและขั้นตอนการสมัครสำหรับผู้สนใจเข้าศึกษา"
-        />
+        
+        {/* New Title Section - Same style as Activity page */}
+        <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
+          <h1 style={{ 
+            fontSize: '2.5rem', 
+            fontWeight: 'bold', 
+            marginBottom: '0.5rem',
+            color: '#1a1a1a'
+          }}>
+            เกณฑ์การรับเข้า
+          </h1>
+          <div style={{
+            width: '80px',
+            height: '4px',
+            background: 'linear-gradient(to right, #dc2626, #7d1315)',
+            margin: '1rem auto',
+            borderRadius: '2px'
+          }}></div>
+          <p style={{ color: '#666', fontSize: '1.1rem' }}>
+            คุณสมบัติและขั้นตอนการสมัครสำหรับผู้สนใจเข้าศึกษา
+          </p>
+        </div>
+
         {COURSES.map((c, i) => (
           <CourseCard key={i} course={c} index={i} />
         ))}
