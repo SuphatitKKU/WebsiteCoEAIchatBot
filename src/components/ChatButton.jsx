@@ -4,7 +4,7 @@ import ChatWindowDesktop from './ChatWindowDesktop';
 import ChatWindowMobile from './ChatWindowMobile'; // Import the new mobile chat window
 
 const ChatButton = () => {
-  const {
+const {
     isOpen,
     isVisible,
     messages,
@@ -16,7 +16,9 @@ const ChatButton = () => {
     handleSendMessage,
     handleKeyPress,
     formatAIResponse,
-    showInitialWelcomeUI
+    showInitialWelcomeUI,
+    showPetitionAlert,
+    setShowPetitionAlert
   } = useChatLogic(); // Use the custom hook for all chat logic
 
   // Tailwind CSS theme colors
@@ -38,6 +40,8 @@ const ChatButton = () => {
     handleKeyPress,
     formatAIResponse,
     showInitialWelcomeUI,
+    showPetitionAlert,
+    setShowPetitionAlert
   };
 
   return (
