@@ -4,7 +4,7 @@ import InitialWelcomeUI from './InitialWelcomeUI';
 
 const ChatWindowDesktop = ({
   isOpen,
-  isVisible, // This prop is used by the parent to decide when to mount, but for the window itself, isOpen handles animation
+  isVisible,
   messages,
   inputMessage,
   isLoading,
@@ -14,28 +14,49 @@ const ChatWindowDesktop = ({
   handleSendMessage,
   handleKeyPress,
   formatAIResponse,
-  showInitialWelcomeUI
+  showInitialWelcomeUI,
+  // Props สำหรับ Pop-up
+  showPetitionAlert,
+  setShowPetitionAlert
 }) => {
   const primaryColor = 'bg-[#9a1518]';
   const primaryHoverColor = 'hover:bg-[#7e1214]';
 
-  // Make sure this component is only rendered when visible and on desktop-sized screens
   if (!isVisible) return null;
 
   return (
     <div className={`fixed bottom-24 right-6 z-50 flex flex-col
                     w-96 md:w-[420px] lg:w-[460px]
-                    h-[380px] md:h-[430px] lg:h-[480px] // Specific heights for desktop
+                    h-[380px] md:h-[430px] lg:h-[480px] // ขนาดคงที่
                     rounded-2xl shadow-[0_20px_60px_rgba(0,0,0,0.3)]
                     transition-all duration-300 ease-out origin-bottom-right overflow-hidden
                     ${isOpen ? 'opacity-100 scale-100 translate-y-0' : 'opacity-0 scale-95 translate-y-4'}
-                    hidden sm:flex`} // Hidden on small screens, shown on sm and up
+                    hidden sm:flex`} 
           style={{
             background: 'rgba(255, 255, 255, 0.5)',
             backdropFilter: 'blur(20px) saturate(180%)',
             WebkitBackdropFilter: 'blur(20px) saturate(180%)',
             border: '1px solid rgba(255, 255, 255, 0.2)',
           }}>
+
+      {/* START: CODE FOR POPUP ALERT */}
+      {showPetitionAlert && ( 
+        <div className="absolute inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-[60]"> 
+          <div className="bg-white p-6 rounded-xl shadow-2xl max-w-sm w-full mx-4 border-t-4 border-[#9a1518] transform transition-all duration-300 scale-100 animate-fadeIn">
+            <h3 className="text-xl font-extrabold text-[#9a1518] mb-2">🔔 แจ้งเตือน: การยื่นคำร้อง</h3>
+            <p className="text-gray-700 text-base">เนื่องจากการดำเนินการต้องใช้เวลา **กรุณาตรวจสอบกำหนดเวลายื่นคำร้องตามที่ท่านประสงค์**</p>
+            <div className="flex justify-end mt-4">
+              <button
+                onClick={() => setShowPetitionAlert(false)} // ปิด Pop-up
+                className={`${primaryColor} ${primaryHoverColor} text-white font-semibold py-2 px-4 rounded-lg shadow-md transition-all duration-200 hover:shadow-lg active:scale-95`}
+              >
+                รับทราบ
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* END: CODE FOR POPUP ALERT */}
 
       {/* Header with Gradient */}
       <div className={`p-3 flex justify-between items-center ${primaryColor} relative overflow-hidden flex-none`}
