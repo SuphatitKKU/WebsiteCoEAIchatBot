@@ -1,8 +1,22 @@
 import React, { useState } from "react";
 import { db } from "../firebase/config";
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import emailjs from '@emailjs/browser';
 import assets from "../assets/assets";
 import Title from "../components/Title";
+
+// ⚙️ ตั้งค่า EmailJS
+const EMAILJS_SERVICE_ID = "service_0ouzgf9";
+const EMAILJS_TEMPLATE_ID = "template_0kghkbr";
+const EMAILJS_PUBLIC_KEY = "OF3aExeaYDE0LidPi";
+
+// 📧 รายชื่ออีเมล Admin ทั้งหมด (เปลี่ยนตามต้องการ)
+const ADMIN_EMAILS = [
+  'suphatitsrichat@gmail.com',
+  'suphatit.s@kkumail.com',
+  'warunee.i@kkumail.com',
+  'konggidagon.o@kkumail.com'
+].join(', ');
 
 // Star Rating Component
 const StarRating = ({ rating, onRatingChange }) => {
@@ -62,8 +76,8 @@ export default function Feedback() {
     setError("");
     
     try {
-      // บันทึกลง Firebase
-      await addDoc(collection(db, 'feedbacks'), {
+      // 1. บันทึกลง Firestore
+      const feedbackDoc = await addDoc(collection(db, 'feedbacks'), {
         name: name.trim() || 'ไม่ระบุชื่อ',
         email: email.trim() || null,
         feedbackType: feedbackType,
@@ -73,11 +87,46 @@ export default function Feedback() {
         status: 'unread'
       });
       
-      console.log("Feedback saved to Firebase successfully!");
+      console.log("✅ Feedback saved to Firebase!");
+
+      // 2. ส่งอีเมลผ่าน EmailJS
+      const feedbackTypeText = {
+        general: "💬 ทั่วไป",
+        bug: "🐛 แจ้งปัญหา/บั๊ก",
+        suggestion: "💡 ข้อเสนอแนะ/ปรับปรุง",
+        compliment: "👏 คำชม",
+      };
+
+      const templateParams = {
+        email: ADMIN_EMAILS,  // ✅ เปลี่ยนจาก to_email เป็น email ตาม template
+        from_name: name.trim() || 'ไม่ระบุชื่อ',
+        from_email: email.trim() || 'ไม่ระบุอีเมล',
+        feedback_type: feedbackTypeText[feedbackType],
+        message: message.trim(),
+        rating: rating,
+        feedback_id: feedbackDoc.id,
+        timestamp: new Date().toLocaleString("th-TH")
+      };
+
+      await emailjs.send(
+        EMAILJS_SERVICE_ID,
+        EMAILJS_TEMPLATE_ID,
+        templateParams,
+        EMAILJS_PUBLIC_KEY
+      );
+
+      console.log("✅ Email sent successfully to admins!");
       setSubmitted(true);
+      
     } catch (error) {
-      console.error("Error saving feedback:", error);
-      setError('เกิดข้อผิดพลาดในการส่ง Feedback กรุณาลองอีกครั้ง');
+      console.error("❌ Error:", error);
+      
+      // แสดง error ที่เฉพาะเจาะจง
+      if (error.text) {
+        setError(`ส่ง Feedback สำเร็จแต่ส่งอีเมลไม่สำเร็จ: ${error.text}`);
+      } else {
+        setError('เกิดข้อผิดพลาดในการส่ง Feedback กรุณาลองอีกครั้ง');
+      }
     } finally {
       setSubmitting(false);
     }
@@ -95,7 +144,7 @@ export default function Feedback() {
 
   return (
     <main className="card-wrap" style={{ position: 'relative' }}>
-      {/* Background images positioned absolutely */}
+      {/* Background images */}
       <img 
         src={assets.bgImage1} 
         alt="" 
@@ -109,7 +158,6 @@ export default function Feedback() {
         }}
       />
 
-      {/* Content wrapper with higher z-index */}
       <div style={{ position: 'relative', zIndex: 10 }}>
         <Title
           title="ส่งความคิดเห็นถึงเรา"
@@ -131,6 +179,9 @@ export default function Feedback() {
                   </h2>
                   <p className="text-lg text-gray-600 mb-2">
                     เราได้รับข้อความของคุณแล้วและจะนำไปพิจารณา
+                  </p>
+                  <p className="text-sm text-gray-500 mb-2">
+                    📧 ทีมงานได้รับการแจ้งเตือนทางอีเมลแล้ว
                   </p>
                   {rating > 0 && (
                     <p className="text-md text-gray-500">
@@ -178,10 +229,7 @@ export default function Feedback() {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
-                    <label
-                      htmlFor="name"
-                      className="block text-sm font-medium text-gray-700"
-                    >
+                    <label htmlFor="name" className="block text-sm font-medium text-gray-700">
                       ชื่อ (ไม่บังคับ)
                     </label>
                     <input
@@ -196,10 +244,7 @@ export default function Feedback() {
                   </div>
 
                   <div>
-                    <label
-                      htmlFor="email"
-                      className="block text-sm font-medium text-gray-700"
-                    >
+                    <label htmlFor="email" className="block text-sm font-medium text-gray-700">
                       อีเมล (สำหรับติดต่อกลับ, ไม่บังคับ)
                     </label>
                     <input
@@ -215,10 +260,7 @@ export default function Feedback() {
                 </div>
 
                 <div>
-                  <label
-                    htmlFor="feedbackType"
-                    className="block text-sm font-medium text-gray-700"
-                  >
+                  <label htmlFor="feedbackType" className="block text-sm font-medium text-gray-700">
                     ประเภทความคิดเห็น
                   </label>
                   <select
@@ -236,10 +278,7 @@ export default function Feedback() {
                 </div>
 
                 <div>
-                  <label
-                    htmlFor="message"
-                    className="block text-sm font-medium text-gray-700"
-                  >
+                  <label htmlFor="message" className="block text-sm font-medium text-gray-700">
                     ข้อความของคุณ *
                   </label>
                   <textarea
