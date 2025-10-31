@@ -96,9 +96,9 @@ const News = () => {
                                 <div className='w-full max-w-6xl grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8'>
                                     {newsData.map((newsItem, index) => (
                                         <Link 
-                                            key={index} 
+                                            key={newsItem.id || index}
                                             to="/activity"
-                                            className='block transition-transform hover:scale-105'
+                                            className='block'
                                         >
                                             <NewsCard news={newsItem} />
                                         </Link>

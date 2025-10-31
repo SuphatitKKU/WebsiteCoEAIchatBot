@@ -168,6 +168,21 @@ const liquidGlassStyles = `
 const NewsCard = ({ news }) => {
     const [isHovered, setIsHovered] = useState(false);
 
+    const getCategoryColor = (category) => {
+        const colors = {
+            'กิจกรรม': 'bg-blue-100 text-blue-700',
+            'ความสำเร็จ': 'bg-green-100 text-green-700',
+            'ประกาศ': 'bg-red-100 text-red-700',
+            'อบรม': 'bg-purple-100 text-purple-700',
+            'ความร่วมมือ': 'bg-yellow-100 text-yellow-700',
+            'สัมมนา': 'bg-indigo-100 text-indigo-700',
+            'ทุนวิจัย': 'bg-pink-100 text-pink-700',
+            'กิจกรรมอาสา': 'bg-teal-100 text-teal-700',
+            'ทั่วไป': 'bg-gray-100 text-gray-700'
+        };
+        return colors[category] || 'bg-gray-100 text-gray-700';
+    };
+
     return (
         <>
             <style dangerouslySetInnerHTML={{ __html: liquidGlassStyles }} />
@@ -184,7 +199,7 @@ const NewsCard = ({ news }) => {
                 `}
                 onMouseEnter={() => setIsHovered(true)}
                 onMouseLeave={() => setIsHovered(false)}
-                style={{ minHeight: '400px' }}
+                style={{ minHeight: '450px' }}
             >
                 {/* Liquid animated overlay */}
                 <div className="liquid-overlay absolute inset-0 rounded-2xl pointer-events-none" />
@@ -200,30 +215,60 @@ const NewsCard = ({ news }) => {
                     "
                 />
 
-                {/* Image Section */}
+                {/* Image Section with Category Badge */}
                 <div className='w-full h-48 sm:h-56 overflow-hidden relative rounded-t-2xl'>
                     <img
                         src={news?.image || 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=400&h=300&fit=crop'}
-                        alt={news?.title || 'News Image'}
+                        alt={news?.title || 'ข่าวสาร'}
                         className='w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500 ease-in-out'
                     />
                     {/* Image overlay for additional glass effect */}
                     <div className='absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-white/10 opacity-60 group-hover:opacity-80 transition-opacity duration-500'></div>
+                    
+                    {/* Category Badge */}
+                    {news?.category && (
+                        <div className='absolute top-4 right-4'>
+                            <span className={`px-3 py-1 rounded-full text-xs font-semibold shadow-lg ${getCategoryColor(news.category)}`}>
+                                {news.category}
+                            </span>
+                        </div>
+                    )}
                 </div>
 
                 {/* Content Section */}
                 <div className='p-6 flex flex-col flex-grow relative z-10'>
+                    {/* Date and Author Info */}
+                    {(news?.date || news?.author) && (
+                        <div className='flex items-center gap-3 mb-3 text-xs text-gray-600 flex-wrap'>
+                            {news?.date && (
+                                <div className='flex items-center gap-1'>
+                                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                    </svg>
+                                    <span>{news.date}</span>
+                                </div>
+                            )}
+                            {news?.author && (
+                                <div className='flex items-center gap-1'>
+                                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                    </svg>
+                                    <span>{news.author}</span>
+                                </div>
+                            )}
+                        </div>
+                    )}
+
                     <h3 className='text-xl font-semibold mb-2 line-clamp-2'>
-                        {news?.title || 'ข่าวสารล่าสุดเกี่ยวกับเทคโนโลยีและนวัตกรรม'}
+                        {news?.title || 'ข่าวสารล่าสุด'}
                     </h3>
                     <p className='text-base mb-4 flex-grow line-clamp-3'>
-                        {news?.description || 'รายละเอียดข่าวสารที่น่าสนใจและอัพเดทล่าสุด พร้อมข้อมูลที่เป็นประโยชน์สำหรับผู้อ่านทุกท่าน ติดตามข่าวสารและความเคลื่อนไหวใหม่ๆ ที่จะส่งผลต่อชีวิตประจำวัน'}
+                        {news?.excerpt || 'รายละเอียดข่าวสาร...'}
                     </p>
                     
                     {/* Read More Button with glass effect */}
                     <div className='mt-auto pt-4'>
-                        <a
-                            href="#"
+                        <div
                             className={`
                                 inline-flex items-center gap-2 px-4 py-2 rounded-lg
                                 font-medium text-sm
@@ -238,13 +283,12 @@ const NewsCard = ({ news }) => {
                             <span className='transform group-hover/button:translate-x-1 transition-transform duration-300'>
                                 →
                             </span>
-                        </a>
+                        </div>
                     </div>
                 </div>
             </div>
         </>
     );
 };
-
 
 export default NewsCard;

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { BookOpen, Newspaper, Menu, MessageSquare, ChevronLeft, Bot, LogOut, AlertTriangle } from 'lucide-react';
 import { auth, googleProvider } from '../firebase/config';
-import { signInWithPopup, signInWithRedirect, getRedirectResult, signOut, onAuthStateChanged, setPersistence, browserLocalPersistence, browserSessionPersistence } from 'firebase/auth';
+import { signInWithPopup, signInWithRedirect, getRedirectResult, signOut, onAuthStateChanged } from 'firebase/auth';
 import Sidebar from './Sidebar';
 import CourseManagement from './CourseManagement';
 import NewsManagement from './NewsManagement';
@@ -74,7 +74,7 @@ const LoginPage = ({ onLoginSuccess }) => {
       try {
         setLoading(true);
         const result = await getRedirectResult(auth);
-        if (result) {
+        if (result && result.user) {
           console.log('✅ Login successful (redirect):', result.user);
           onLoginSuccess(result.user);
         }
