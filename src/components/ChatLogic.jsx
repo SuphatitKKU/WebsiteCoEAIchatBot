@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 
-const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
+// ✅ Hardcoded API Key (ชั่วคราว - ควรย้ายไปใช้ environment variables ในโปรเจกต์จริง)
+const GEMINI_API_KEY = "AIzaSyBprj3OSZ2AI5OQNvzvuLu25UFF1biCLJo";
 const GEMINI_API_URL =
   "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent";
 
