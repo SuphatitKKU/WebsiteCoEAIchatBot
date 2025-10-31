@@ -20,6 +20,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen, currentMenu, setCurrentMenu, set
             onClick={() => {
               setCurrentMenu('courses');
               setSelectedCourse(null);
+              setSidebarOpen(false);
             }}
             className={`w-full flex items-center space-x-3 px-4 py-3 text-white rounded-lg transition-colors ${
               currentMenu === 'courses' ? 'bg-white/10' : 'hover:bg-white/10'
@@ -34,6 +35,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen, currentMenu, setCurrentMenu, set
               setCurrentMenu('news');
               setSelectedCourse(null);
               setShowNewsForm(false);
+              setSidebarOpen(false);
             }}
             className={`w-full flex items-center space-x-3 px-4 py-3 text-white rounded-lg transition-colors ${
               currentMenu === 'news' ? 'bg-white/10' : 'hover:bg-white/10'
@@ -48,6 +50,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen, currentMenu, setCurrentMenu, set
               setCurrentMenu('feedback');
               setSelectedCourse(null);
               setShowNewsForm(false);
+              setSidebarOpen(false);
             }}
             className={`w-full flex items-center space-x-3 px-4 py-3 text-white rounded-lg transition-colors ${
               currentMenu === 'feedback' ? 'bg-white/10' : 'hover:bg-white/10'
