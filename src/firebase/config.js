@@ -1,7 +1,8 @@
 // Import Firebase modules
 import { initializeApp } from 'firebase/app';
 import { getFirestore } from 'firebase/firestore';
-import { getStorage } from 'firebase/storage'; // ← เพิ่มบรรทัดนี้
+import { getStorage } from 'firebase/storage';
+import { getAuth, GoogleAuthProvider } from 'firebase/auth'; // ← เพิ่มบรรทัดนี้
 
 // Firebase configuration
 const firebaseConfig = {
@@ -17,11 +18,11 @@ const firebaseConfig = {
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 
-// Initialize Firestore
+// Initialize Services
 const db = getFirestore(app);
-
-// Initialize Storage ← เพิ่มบรรทัดนี้
 const storage = getStorage(app);
+const auth = getAuth(app); // ← เพิ่มบรรทัดนี้
+const googleProvider = new GoogleAuthProvider(); // ← เพิ่มบรรทัดนี้
 
-// Export ทั้ง db และ storage ← แก้ไขบรรทัดนี้
-export { db, storage };
+// Export services
+export { db, storage, auth, googleProvider };
