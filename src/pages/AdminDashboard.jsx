@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
-import { BookOpen, Newspaper, Menu } from 'lucide-react';
+import { BookOpen, Newspaper, Menu, MessageSquare } from 'lucide-react';
 import Sidebar from './Sidebar';
 import CourseManagement from './CourseManagement';
 import NewsManagement from './NewsManagement';
+import FeedbackManagement from './FeedbackManagement';
 
 const AdminDashboard = () => {
-  const [currentMenu, setCurrentMenu] = useState('courses'); // courses, news
+  const [currentMenu, setCurrentMenu] = useState('courses'); // courses, news, feedback
   const [selectedCourse, setSelectedCourse] = useState(null);
   const [uploadedFiles, setUploadedFiles] = useState({
     course1: [],
@@ -87,6 +88,28 @@ const AdminDashboard = () => {
     setShowNewsForm(true);
   };
 
+  // Function to get menu title and icon
+  const getMenuDisplay = () => {
+    if (currentMenu === 'news') {
+      return {
+        icon: <Newspaper className="mr-3 text-[#dc2626]" size={28} />,
+        title: showNewsForm ? (editingNews ? 'แก้ไขข่าวสาร' : 'เขียนข่าวสารใหม่') : 'จัดการข่าวสาร'
+      };
+    } else if (currentMenu === 'feedback') {
+      return {
+        icon: <MessageSquare className="mr-3 text-[#dc2626]" size={28} />,
+        title: 'จัดการ Feedback'
+      };
+    } else {
+      return {
+        icon: <BookOpen className="mr-3 text-[#dc2626]" size={28} />,
+        title: selectedCourse ? selectedCourse.name : 'จัดการหลักสูตรทั้งหมด'
+      };
+    }
+  };
+
+  const menuDisplay = getMenuDisplay();
+
   return (
     <div className="flex h-screen bg-gray-50">
       <Sidebar 
@@ -113,17 +136,8 @@ const AdminDashboard = () => {
             )}
             <div>
               <h2 className="text-2xl font-bold text-gray-800 flex items-center">
-                {currentMenu === 'news' ? (
-                  <>
-                    <Newspaper className="mr-3 text-[#dc2626]" size={28} />
-                    {showNewsForm ? (editingNews ? 'แก้ไขข่าวสาร' : 'เขียนข่าวสารใหม่') : 'จัดการข่าวสาร'}
-                  </>
-                ) : (
-                  <>
-                    <BookOpen className="mr-3 text-[#dc2626]" size={28} />
-                    {selectedCourse ? selectedCourse.name : 'จัดการหลักสูตรทั้งหมด'}
-                  </>
-                )}
+                {menuDisplay.icon}
+                {menuDisplay.title}
               </h2>
             </div>
           </div>
@@ -140,7 +154,7 @@ const AdminDashboard = () => {
               handleFileUpload={handleFileUpload}
               removeFile={removeFile}
             />
-          ) : (
+          ) : currentMenu === 'news' ? (
             <NewsManagement
               news={news}
               showNewsForm={showNewsForm}
@@ -151,6 +165,8 @@ const AdminDashboard = () => {
               handleDeleteNews={handleDeleteNews}
               handleEditNews={handleEditNews}
             />
+          ) : (
+            <FeedbackManagement />
           )}
         </div>
       </div>

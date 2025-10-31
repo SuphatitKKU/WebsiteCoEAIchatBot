@@ -1,5 +1,5 @@
-import React from 'react'
-import { HashRouter as Router, Routes, Route } from 'react-router-dom'
+import React, { useEffect } from 'react'
+import { HashRouter as Router, Routes, Route, useLocation } from 'react-router-dom'
 import Navbar from './components/Navbar'
 import Footer from './components/Footer'
 import ChatButton from './components/ChatButton'
@@ -14,6 +14,17 @@ import Activity from './pages/Activity'
 import Contact from './pages/Contact'
 import Feedback from './pages/Feedback'
 import AdminDashboard from './pages/AdminDashboard'
+
+// Component สำหรับเลื่อนกลับขึ้นด้านบนเมื่อเปลี่ยนหน้า
+const ScrollToTop = () => {
+  const { pathname } = useLocation()
+  
+  useEffect(() => {
+    window.scrollTo(0, 0)
+  }, [pathname])
+  
+  return null
+}
 
 const DefaultLayout = ({ children }) => (
   <div className="min-h-screen bg-white">
@@ -52,6 +63,7 @@ const NotFound = () => (
 const App = () => {
   return (
     <Router>
+      <ScrollToTop />
       <Routes>
         <Route path="/" element={<DefaultLayout><HomePage /></DefaultLayout>} />
         <Route path="/admission" element={<DefaultLayout><Admission /></DefaultLayout>} />

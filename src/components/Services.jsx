@@ -1,4 +1,5 @@
 import React from 'react'
+import { Link } from 'react-router-dom'
 import assets from '../assets/assets'
 import Title from './Title'
 import ServiceCard from './ServiceCard'
@@ -9,22 +10,26 @@ const Services = () => {
         {
             title: 'เกณฑ์การรับเข้า',
             description: 'อธิบายคุณสมบัติและขั้นตอนการสมัครสำหรับผู้สนใจเข้าศึกษา',
-            icon: assets.graduation_hat
+            icon: assets.graduation_hat,
+            link: '/admission'
         },
         {
             title: 'ข้อมูลหลักสูตร',
             description: 'แนะนำรายละเอียดหลักสูตร โครงสร้างรายวิชา และโอกาสทางอาชีพหลังสำเร็จการศึกษา',
-            icon: assets.book_open
+            icon: assets.book_open,
+            link: '/course'
         },
         {
             title: 'แนะแนว & กิจกรรม',
             description: 'ให้คำปรึกษาด้านการเรียน พร้อมกิจกรรมเสริมสร้างทักษะและประสบการณ์นอกห้องเรียน',
-            icon: assets.megaphone
+            icon: assets.megaphone,
+            link: '/activity'
         },
         {
             title: 'ติดต่อ',
             description: 'รวมช่องทางการติดต่อสถาบัน เช่น ที่อยู่ เบอร์โทร อีเมล และช่องทางออนไลน์',
-            icon: assets.location
+            icon: assets.location,
+            link: '/contact'
         }
     ]
 
@@ -77,9 +82,13 @@ const Services = () => {
                     <div className='w-full max-w-7xl mx-auto'>
                         <div className='grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8 place-items-center md:place-items-stretch'>
                             {servicesData.map((service, index) => (
-                                <div key={index} className='w-full max-w-lg md:max-w-none'>
+                                <Link 
+                                    key={index} 
+                                    to={service.link}
+                                    className='w-full max-w-lg md:max-w-none block'
+                                >
                                     <ServiceCard service={service} index={index}/>
-                                </div>
+                                </Link>
                             ))}
                         </div>
                     </div>

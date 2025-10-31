@@ -1,26 +1,35 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
+import { Loader } from 'lucide-react';
 import assets from '../assets/assets';
 import Title from './Title';
 import NewsCard from './NewsCard';
+import { getAllPublishedNews } from '../firebase/newsService';
 
 const News = () => {
-    const NewsData = [
-        {
-            title: 'ข่าวการรับนักศึกษาใหม่',
-            description: 'ประกาศรับสมัครนักศึกษาใหม่ หลักสูตรวิศวกรรมคอมพิวเตอร์และวิศวกรรมสื่อดิจิตอล ปีการศึกษา 2568',
-            image: assets.news1
-        },
-        {
-            title: 'กิจกรรมวิชาการและงานวิจัย',
-            description: 'ข่าวสารเกี่ยวกับการประชุมวิชาการ การนำเสนองานวิจัย และความร่วมมือทางวิชาการกับหน่วยงานต่างๆ',
-            image: assets.news2
-        },
-        {
-            title: 'ผลงานนักศึกษาและบุคลากร',
-            description: 'เผยแพร่ผลงานดีเด่นของนักศึกษาและอาจารย์ รางวัลที่ได้รับ และความสำเร็จในการแข่งขัน',
-            image: assets.news3
-        }
-    ];
+    const [newsData, setNewsData] = useState([]);
+    const [loading, setLoading] = useState(true);
+
+    // ดึงข่าวล่าสุด 3 ข่าวจาก Firebase (แหล่งเดียวกับ Activity)
+    useEffect(() => {
+        const fetchLatestNews = async () => {
+            try {
+                setLoading(true);
+                const allNews = await getAllPublishedNews();
+                // เอาแค่ 3 ข่าวแรก (ข่าวล่าสุด)
+                const latestThreeNews = allNews.slice(0, 3);
+                setNewsData(latestThreeNews);
+            } catch (error) {
+                console.error('Error loading news:', error);
+                // ถ้าโหลดไม่ได้ ให้แสดงข้อมูล placeholder
+                setNewsData([]);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchLatestNews();
+    }, []);
 
     return (
         <>
@@ -67,14 +76,45 @@ const News = () => {
                                 title='ข่าวประชาสัมพันธ์'
                                 desc='ติดตามข่าวสารและกิจกรรมต่างๆ ของคณะวิศวกรรมคอมพิวเตอร์และวิศวกรรมสื่อดิจิตอล มหาวิทยาลัยขอนแก่น'
                             />
+                            {/* ปุ่มดูข่าวทั้งหมด */}
+                            <Link to="/activity">
+                                <button className='mt-6 px-5 py-2 bg-gradient-to-r from-red-600 to-red-800 text-white text-sm font-semibold rounded-lg hover:shadow-lg transform hover:scale-105 transition-all duration-300'>
+                                    ดูข่าวทั้งหมด →
+                                </button>
+                            </Link>
                         </div>
 
-                        {/* News Cards Grid */}
-                        <div className='w-full max-w-6xl grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8'>
-                            {NewsData.map((newsItem, index) => (
-                                <NewsCard key={index} news={newsItem} />
-                            ))}
-                        </div>
+                        {/* Loading State */}
+                        {loading ? (
+                            <div className='flex flex-col items-center justify-center py-12'>
+                                <Loader className="animate-spin mb-4" size={48} color="#dc2626" />
+                                <p className='text-gray-600 text-lg'>กำลังโหลดข่าวล่าสุด...</p>
+                            </div>
+                        ) : newsData.length > 0 ? (
+                            <>
+                                {/* News Cards Grid */}
+                                <div className='w-full max-w-6xl grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8'>
+                                    {newsData.map((newsItem, index) => (
+                                        <Link 
+                                            key={index} 
+                                            to="/activity"
+                                            className='block transition-transform hover:scale-105'
+                                        >
+                                            <NewsCard news={newsItem} />
+                                        </Link>
+                                    ))}
+                                </div>
+                            </>
+                        ) : (
+                            <div className='text-center py-12'>
+                                <p className='text-gray-600 text-lg mb-4'>ยังไม่มีข่าวสารในขณะนี้</p>
+                                <Link to="/activity">
+                                    <button className='px-6 py-2 bg-gradient-to-r from-red-600 to-red-800 text-white font-semibold rounded-xl hover:shadow-lg transition-all duration-300'>
+                                        ไปหน้าข่าวสาร
+                                    </button>
+                                </Link>
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>

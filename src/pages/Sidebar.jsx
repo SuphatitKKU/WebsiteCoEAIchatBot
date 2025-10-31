@@ -1,5 +1,5 @@
 import React from 'react';
-import { BookOpen, ChevronLeft, Menu, Settings, Bot, Newspaper } from 'lucide-react';
+import { BookOpen, ChevronLeft, Menu, Settings, Bot, Newspaper, MessageSquare } from 'lucide-react';
 
 const Sidebar = ({ sidebarOpen, setSidebarOpen, currentMenu, setCurrentMenu, setSelectedCourse, setShowNewsForm }) => {
   return (
@@ -42,15 +42,24 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen, currentMenu, setCurrentMenu, set
             <Newspaper size={20} />
             <span>จัดการข่าวสาร</span>
           </button>
-          
-          <button className="w-full flex items-center space-x-3 px-4 py-3 text-white rounded-lg hover:bg-white/10 transition-colors">
-            <Bot size={20} />
-            <span>ต้งค่า AI</span>
+
+          <button 
+            onClick={() => {
+              setCurrentMenu('feedback');
+              setSelectedCourse(null);
+              setShowNewsForm(false);
+            }}
+            className={`w-full flex items-center space-x-3 px-4 py-3 text-white rounded-lg transition-colors ${
+              currentMenu === 'feedback' ? 'bg-white/10' : 'hover:bg-white/10'
+            }`}
+          >
+            <MessageSquare size={20} />
+            <span>จัดการ Feedback</span>
           </button>
           
           <button className="w-full flex items-center space-x-3 px-4 py-3 text-white rounded-lg hover:bg-white/10 transition-colors">
-            <Settings size={20} />
-            <span>ตั้งค่าทั่วไป</span>
+            <Bot size={20} />
+            <span>ตั้งค่า AI</span>
           </button>
         </nav>
       </div>

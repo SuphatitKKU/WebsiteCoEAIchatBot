@@ -1,8 +1,9 @@
 // Import Firebase modules
 import { initializeApp } from 'firebase/app';
 import { getFirestore } from 'firebase/firestore';
+import { getStorage } from 'firebase/storage'; // ← เพิ่มบรรทัดนี้
 
-// Firebase configuration - แทนที่ด้วยค่าจริงจาก Firebase Console
+// Firebase configuration
 const firebaseConfig = {
   apiKey: "AIzaSyDo7pLpmv04Eyk3K-fBZtUvKIZLCcqot1o",
   authDomain: "codme-cb7b4.firebaseapp.com",
@@ -19,4 +20,8 @@ const app = initializeApp(firebaseConfig);
 // Initialize Firestore
 const db = getFirestore(app);
 
-export { db };
+// Initialize Storage ← เพิ่มบรรทัดนี้
+const storage = getStorage(app);
+
+// Export ทั้ง db และ storage ← แก้ไขบรรทัดนี้
+export { db, storage };
