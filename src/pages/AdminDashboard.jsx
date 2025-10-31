@@ -60,7 +60,8 @@ const LogoutModal = ({ isOpen, onClose, onConfirm, userName }) => {
 
 // ============= LOGIN PAGE =============
 const LoginPage = ({ onLoginSuccess }) => {
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true); // เริ่มต้นด้วย true
+  const [checkingRedirect, setCheckingRedirect] = useState(true);
 
   // ตรวจสอบว่าเป็น Mobile หรือไม่
   const isMobile = () => {
@@ -71,20 +72,33 @@ const LoginPage = ({ onLoginSuccess }) => {
   // ตรวจสอบ redirect result เมื่อกลับมาจากหน้า login (สำหรับ Mobile)
   useEffect(() => {
     const checkRedirectResult = async () => {
+      console.log('🔍 Checking redirect result...');
       try {
-        setLoading(true);
         const result = await getRedirectResult(auth);
+        console.log('📊 Redirect result:', result);
+        
         if (result && result.user) {
           console.log('✅ Login successful (redirect):', result.user);
+          console.log('👤 User info:', {
+            uid: result.user.uid,
+            email: result.user.email,
+            displayName: result.user.displayName
+          });
           onLoginSuccess(result.user);
+        } else {
+          console.log('ℹ️ No redirect result found');
         }
       } catch (error) {
         console.error('❌ Redirect login error:', error);
+        console.error('Error code:', error.code);
+        console.error('Error message:', error.message);
         if (error.code !== 'auth/popup-closed-by-user') {
           alert('เกิดข้อผิดพลาดในการเข้าสู่ระบบ: ' + error.message);
         }
       } finally {
         setLoading(false);
+        setCheckingRedirect(false);
+        console.log('✓ Redirect check completed');
       }
     };
 
