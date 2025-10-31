@@ -7,6 +7,11 @@ import CourseManagement from './CourseManagement';
 import NewsManagement from './NewsManagement';
 import FeedbackManagement from './FeedbackManagement';
 
+// ตั้งค่า Google Provider
+googleProvider.setCustomParameters({
+  prompt: 'select_account'
+});
+
 // ============= CUSTOM LOGOUT MODAL =============
 const LogoutModal = ({ isOpen, onClose, onConfirm, userName }) => {
   if (!isOpen) return null;
@@ -15,19 +20,14 @@ const LogoutModal = ({ isOpen, onClose, onConfirm, userName }) => {
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full animate-[fadeIn_0.2s_ease-out]">
         <div className="p-6">
-          {/* Icon */}
           <div className="flex justify-center mb-4">
             <div className="bg-red-100 rounded-full p-3">
               <AlertTriangle className="text-[#dc2626]" size={32} />
             </div>
           </div>
-
-          {/* Title */}
           <h3 className="text-2xl font-bold text-gray-800 text-center mb-2">
             ออกจากระบบ
           </h3>
-
-          {/* Message */}
           <p className="text-gray-600 text-center mb-6">
             คุณแน่ใจหรือไม่ว่าต้องการออกจากระบบ?
             {userName && (
@@ -36,8 +36,6 @@ const LogoutModal = ({ isOpen, onClose, onConfirm, userName }) => {
               </span>
             )}
           </p>
-
-          {/* Buttons */}
           <div className="flex space-x-3">
             <button
               onClick={onClose}
@@ -60,8 +58,9 @@ const LogoutModal = ({ isOpen, onClose, onConfirm, userName }) => {
 
 // ============= LOGIN PAGE =============
 const LoginPage = ({ onLoginSuccess }) => {
-  const [loading, setLoading] = useState(true); // เริ่มต้นด้วย true
+  const [loading, setLoading] = useState(true);
   const [checkingRedirect, setCheckingRedirect] = useState(true);
+  const [error, setError] = useState(null);
 
   // ตรวจสอบว่าเป็น Mobile หรือไม่
   const isMobile = () => {
@@ -69,36 +68,37 @@ const LoginPage = ({ onLoginSuccess }) => {
            || window.innerWidth < 768;
   };
 
-  // ตรวจสอบ redirect result เมื่อกลับมาจากหน้า login (สำหรับ Mobile)
+  // ตรวจสอบ redirect result เมื่อกลับมาจากหน้า login
   useEffect(() => {
     const checkRedirectResult = async () => {
       console.log('🔍 Checking redirect result...');
+      console.log('🌐 Current URL:', window.location.href);
+      
       try {
         const result = await getRedirectResult(auth);
         console.log('📊 Redirect result:', result);
         
         if (result && result.user) {
-          console.log('✅ Login successful (redirect):', result.user);
-          console.log('👤 User info:', {
+          console.log('✅ Login successful via redirect!');
+          console.log('👤 User:', {
             uid: result.user.uid,
             email: result.user.email,
-            displayName: result.user.displayName
+            name: result.user.displayName
           });
           onLoginSuccess(result.user);
         } else {
-          console.log('ℹ️ No redirect result found');
+          console.log('ℹ️ No redirect result (normal page load)');
         }
       } catch (error) {
-        console.error('❌ Redirect login error:', error);
-        console.error('Error code:', error.code);
-        console.error('Error message:', error.message);
-        if (error.code !== 'auth/popup-closed-by-user') {
-          alert('เกิดข้อผิดพลาดในการเข้าสู่ระบบ: ' + error.message);
-        }
+        console.error('❌ Redirect error:', error);
+        console.error('Code:', error.code);
+        console.error('Message:', error.message);
+        
+        setError(`เกิดข้อผิดพลาด: ${error.message}`);
       } finally {
         setLoading(false);
         setCheckingRedirect(false);
-        console.log('✓ Redirect check completed');
+        console.log('✓ Check completed');
       }
     };
 
@@ -106,26 +106,56 @@ const LoginPage = ({ onLoginSuccess }) => {
   }, [onLoginSuccess]);
 
   const handleGoogleLogin = async () => {
+    if (loading) return;
+
     setLoading(true);
+    setError(null);
+    
+    console.log('🚀 Login button clicked');
+    console.log('📱 Device:', isMobile() ? 'Mobile' : 'Desktop');
+    console.log('🌐 Origin:', window.location.origin);
+    
     try {
-      if (isMobile()) {
-        // ใช้ redirect สำหรับ Mobile
-        console.log('📱 Using redirect method for mobile');
-        await signInWithRedirect(auth, googleProvider);
-        // หลังจาก redirect จะกลับมาที่ useEffect ด้านบน
-      } else {
-        // ใช้ popup สำหรับ Desktop
-        console.log('💻 Using popup method for desktop');
-        const result = await signInWithPopup(auth, googleProvider);
-        console.log('✅ Login successful (popup):', result.user);
-        onLoginSuccess(result.user);
-      }
+      // ลองใช้ popup ก่อนเสมอ
+      console.log('💻 Attempting popup login...');
+      const result = await signInWithPopup(auth, googleProvider);
+      
+      console.log('✅ Popup login successful!');
+      console.log('👤 User:', {
+        uid: result.user.uid,
+        email: result.user.email,
+        name: result.user.displayName
+      });
+      
+      onLoginSuccess(result.user);
+      
     } catch (error) {
-      console.error('❌ Login error:', error);
-      if (error.code !== 'auth/popup-closed-by-user' && error.code !== 'auth/cancelled-popup-request') {
-        alert('เกิดข้อผิดพลาดในการเข้าสู่ระบบ: ' + error.message);
+      console.error('❌ Popup error:', error);
+      console.error('Code:', error.code);
+      
+      // ถ้า popup ถูกบล็อก และเป็น mobile ให้ลอง redirect
+      if (error.code === 'auth/popup-blocked' && isMobile()) {
+        console.log('🔄 Popup blocked, trying redirect...');
+        try {
+          await signInWithRedirect(auth, googleProvider);
+          console.log('✓ Redirect initiated');
+          // จะ redirect ออกไป แล้วกลับมาที่ useEffect
+        } catch (redirectError) {
+          console.error('❌ Redirect error:', redirectError);
+          setError(`ไม่สามารถเข้าสู่ระบบได้: ${redirectError.message}`);
+          setLoading(false);
+        }
+      } else if (error.code === 'auth/unauthorized-domain') {
+        // ปัญหา authorized domain
+        console.error('🚫 Domain not authorized!');
+        setError('⚠️ กรุณาเพิ่ม domain นี้ใน Firebase Console → Authentication → Authorized domains: ' + window.location.hostname);
+        setLoading(false);
+      } else if (error.code !== 'auth/popup-closed-by-user' && error.code !== 'auth/cancelled-popup-request') {
+        setError(`เกิดข้อผิดพลาด: ${error.message}`);
+        setLoading(false);
+      } else {
+        setLoading(false);
       }
-      setLoading(false);
     }
   };
 
@@ -140,12 +170,27 @@ const LoginPage = ({ onLoginSuccess }) => {
           <p className="text-gray-600">เข้าสู่ระบบเพื่อจัดการหลักสูตร</p>
         </div>
 
+        {/* แสดง Error */}
+        {error && (
+          <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+            <p className="text-sm text-red-600 break-words">{error}</p>
+          </div>
+        )}
+
+        {/* แสดงสถานะการตรวจสอบ redirect */}
+        {checkingRedirect && (
+          <div className="mb-4 text-center text-sm text-gray-600">
+            <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-[#dc2626] mx-auto mb-2"></div>
+            กำลังตรวจสอบการเข้าสู่ระบบ...
+          </div>
+        )}
+
         <button
           onClick={handleGoogleLogin}
-          disabled={loading}
+          disabled={loading || checkingRedirect}
           className="w-full bg-white border-2 border-gray-300 text-gray-700 font-semibold py-3 px-4 rounded-lg hover:bg-gray-50 transition-colors flex items-center justify-center space-x-3 disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          {loading ? (
+          {loading && !checkingRedirect ? (
             <>
               <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-[#dc2626]"></div>
               <span>กำลังเข้าสู่ระบบ...</span>
@@ -165,6 +210,10 @@ const LoginPage = ({ onLoginSuccess }) => {
 
         <div className="mt-6 text-center text-sm text-gray-500">
           <p>เฉพาะผู้ดูแลระบบเท่านั้น</p>
+          {/* Debug info */}
+          <p className="mt-2 text-xs text-gray-400">
+            Domain: {window.location.hostname}
+          </p>
         </div>
       </div>
     </div>
@@ -173,12 +222,9 @@ const LoginPage = ({ onLoginSuccess }) => {
 
 // ============= MAIN ADMIN DASHBOARD =============
 const AdminDashboard = () => {
-  // Auth States
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
-
-  // Dashboard States
   const [currentMenu, setCurrentMenu] = useState('courses');
   const [selectedCourse, setSelectedCourse] = useState(null);
   const [uploadedFiles, setUploadedFiles] = useState({
@@ -193,10 +239,16 @@ const AdminDashboard = () => {
   const [editingNews, setEditingNews] = useState(null);
   const [showNewsForm, setShowNewsForm] = useState(false);
 
-  // ตรวจสอบสถานะการ Login
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       console.log('🔐 Auth state changed:', currentUser ? '✅ Logged in' : '❌ Not logged in');
+      if (currentUser) {
+        console.log('👤 Current user:', {
+          uid: currentUser.uid,
+          email: currentUser.email,
+          name: currentUser.displayName
+        });
+      }
       setUser(currentUser);
       setLoading(false);
     });
@@ -204,21 +256,11 @@ const AdminDashboard = () => {
     return () => unsubscribe();
   }, []);
 
-  // Courses Data
   const courses = [
-    { 
-      id: 'course1', 
-      name: 'หลักสูตรการเขียนโปรแกรม Python',
-      courseId: '1'
-    },
-    { 
-      id: 'course2', 
-      name: 'หลักสูตรการตลาดดิจิทัลขั้นสูง',
-      courseId: '2'
-    }
+    { id: 'course1', name: 'หลักสูตรการเขียนโปรแกรม Python', courseId: '1' },
+    { id: 'course2', name: 'หลักสูตรการตลาดดิจิทัลขั้นสูง', courseId: '2' }
   ];
 
-  // File Upload Handler
   const handleFileUpload = (e) => {
     const files = Array.from(e.target.files);
     const pdfFiles = files.filter(file => file.type === 'application/pdf');
@@ -235,7 +277,6 @@ const AdminDashboard = () => {
     }
   };
 
-  // Remove File Handler
   const removeFile = (courseId, index) => {
     setUploadedFiles(prev => ({
       ...prev,
@@ -243,7 +284,6 @@ const AdminDashboard = () => {
     }));
   };
 
-  // News Handlers
   const handleNewsSubmit = (e) => {
     e.preventDefault();
     const formData = new FormData(e.target);
@@ -276,7 +316,6 @@ const AdminDashboard = () => {
     setShowNewsForm(true);
   };
 
-  // Logout Handlers
   const handleLogoutClick = () => {
     setShowLogoutModal(true);
   };
@@ -297,7 +336,6 @@ const AdminDashboard = () => {
     setShowLogoutModal(false);
   };
 
-  // Get Menu Display
   const getMenuDisplay = () => {
     if (currentMenu === 'news') {
       return {
@@ -317,7 +355,6 @@ const AdminDashboard = () => {
     }
   };
 
-  // Loading State
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -329,17 +366,14 @@ const AdminDashboard = () => {
     );
   }
 
-  // Not Logged In - Show Login Page
   if (!user) {
     return <LoginPage onLoginSuccess={setUser} />;
   }
 
-  // Logged In - Show Dashboard
   const menuDisplay = getMenuDisplay();
 
   return (
     <div className="flex h-screen bg-gray-50">
-      {/* Logout Modal */}
       <LogoutModal 
         isOpen={showLogoutModal}
         onClose={handleLogoutCancel}
@@ -358,9 +392,7 @@ const AdminDashboard = () => {
         onLogout={handleLogoutClick}
       />
 
-      {/* Main Content */}
       <div className="flex-1 overflow-auto">
-        {/* Header */}
         <div className="bg-white border-b border-gray-200 px-8 py-4 flex items-center justify-between sticky top-0 z-10">
           <div className="flex items-center space-x-4">
             {!sidebarOpen && (
@@ -379,7 +411,6 @@ const AdminDashboard = () => {
             </div>
           </div>
           
-          {/* Show user info on mobile */}
           <div className="md:hidden flex items-center space-x-2">
             {user?.photoURL ? (
               <img 
@@ -395,7 +426,6 @@ const AdminDashboard = () => {
           </div>
         </div>
 
-        {/* Content Area */}
         <div className="p-8">
           {currentMenu === 'courses' ? (
             <CourseManagement
